@@ -25,8 +25,22 @@ import TrackOrder from './components/TrackOrder';
 // Styles
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
+import { useEffect, useState } from 'react';
 
 function App() {
+  // let name = useState('');
+  // let username = useState('');
+  // let password = useState('');
+  // let isLoggedIn = useState(false);
+
+  useEffect(() => {
+    sessionStorage.setItem('name', '');
+    sessionStorage.setItem('customerId', '')
+    sessionStorage.setItem('username', '');
+    sessionStorage.setItem('password', '');
+    sessionStorage.setItem('isLoggedIn', false);
+  });
+
   return (
     <>
       <NavigationBar />

@@ -11,20 +11,20 @@ import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
 function ProductList() {
     const [products, setProducts] = useState([]);
-    const [isFetching, setFetch] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
     const { customerId } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
     const fetchProducts = async () => {
-        setFetch(true);
-        setError(null);
+        setIsFetching(true);
+        setError('');
 
-        const timeoutDuration = 10000;
-        const timeoutId = setTimeout(() => {
-            setFetch(false);
-        }, timeoutDuration);
+        // const timeoutDuration = 10000;
+        // const timeoutId = setTimeout(() => {
+        //     setFetch(false);
+        // }, timeoutDuration);
 
         try {
             const response = await axios.get('http://127.0.0.1:5000/products/active-products');
@@ -32,15 +32,13 @@ function ProductList() {
         } catch (error) {
             setError('Error fetching products:', error)
         } finally {
-            clearTimeout(timeoutId);
-            setFetch(false);
+            // clearTimeout(timeoutId);
+            setIsFetching(false);
         }
     };
 
     const handleClose = () => {
         setShowRedirect(false);
-        setProducts([]);
-        setFetch(false);
         if (customerId) {
             navigate('/place-order');
         } else {
@@ -62,14 +60,19 @@ function ProductList() {
 
     return (
         <Container>
-            <h3>Products</h3>
-                {products.map(product => (
-                    <ListGroup key={product.id} horizontal onClick={setShowRedirect(true)} >
-                        <ListGroup.Item action variant='primary'>ID: {product.id} </ListGroup.Item>
-                        <ListGroup.Item action variant='info'>{product.name} </ListGroup.Item>
-                        <ListGroup.Item action variant='success'> ${product.price} </ListGroup.Item>
-                    </ListGroup>
-                ))}
+            <h2 className='text-warning mb-5 h1' >Products</h2>
+                {error && <p className="text-danger">{error}</p>}
+                {products.length === 0 ? (
+                    <p>No products available.</p>
+                ) : (
+                    products.map(product => (
+                        <ListGroup key={product.id} horizontal onClick={() => setShowRedirect(true)} >
+                            <ListGroup.Item action variant='primary'>ID: {product.id} </ListGroup.Item>
+                            <ListGroup.Item action variant='info'>{product.name} </ListGroup.Item>
+                            <ListGroup.Item action variant='success'> ${product.price} </ListGroup.Item>
+                        </ListGroup>
+                    ))
+                )}
 
             <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
@@ -79,7 +82,7 @@ function ProductList() {
                     Redirecting you to {customerId ? 'place an order' : 'login'} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='outline-secondary' onClick={setShowRedirect(false)} >
+                    <Button variant='outline-secondary' onClick={() => setShowRedirect(false)} >
                         Back to Products
                     </Button>
                     <Button variant='outline-primary' onClick={handleClose} >

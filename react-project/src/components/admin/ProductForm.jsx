@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { object, func } from 'prop-types';
-import { Form, Button, Alert, Modal, Spinner } from "react-bootstrap";
+import { Container, Form, Button, Alert, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
 
 function ProductForm() {
@@ -109,7 +109,7 @@ function ProductForm() {
                     <Form.Control 
                         type="number"
                         name="productPrice"
-                        value={customer.price}
+                        value={product.price}
                         onChange={handleChange}
                         isInvalid={!!errors.price}
                     />

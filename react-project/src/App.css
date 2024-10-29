@@ -1,17 +1,60 @@
 /* Text Styles */
 @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Gayathri:wght@100;400;700&family=Instrument+Serif:ital@0;1&display=swap');
 
+HTML {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: 'Gayathri';
+  font-size: 20px;
+}
+
+img {
+  width: 100px;
+  height: auto;
+}
+
+img:hover {
+  border: solid 2px gold;
+}
+
+.navLink {
+  color: goldenrod;
+  text-decoration: none;
+  margin: 8px;
+  padding-left: 10px;
+}
+
+.navLink:hover {
+  color: lightgoldenrodyellow;
+  transition: ease-in-out .3s;
+}
+
+.navLink:active, .navLink.active {
+  /* color: black !important; */
+  color: lightgoldenrodyellow !important;
+  text-decoration: underline;
+  font-weight: bold;
+  /* background: rgba(221, 188, 1, 0.9); */
+  border-radius: 15px;
+  box-shadow: 0 0 13px 7px lemonchiffon;
+}
+
+.shopBtn {
+  width: 100%;
+  font-size: 20px;
 }
 
 h1 {
   font-family: 'Abril Fatface';
+  letter-spacing: 4px;
 }
 
 h2, h3, h4 {
   font-family: 'Instrument Serif';
+  text-align: center;
+  text-decoration: underline;
 }
 
 .homeButton {

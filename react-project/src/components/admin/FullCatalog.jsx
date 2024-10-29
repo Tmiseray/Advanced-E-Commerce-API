@@ -77,8 +77,8 @@ function FullCatalog() {
                     </ListGroup>
                 ))}
             </>
-        )
-    }
+        );
+    };
 
     useEffect(() => {
         fetchProducts();
@@ -132,4 +132,5 @@ function FullCatalog() {
         </Container>
     );
 };
+
 export default FullCatalog;
