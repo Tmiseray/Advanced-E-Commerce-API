@@ -1,6 +1,5 @@
 import { Route, Routes } from 'react-router-dom';
 // Admin Components
-import ActiveCatalog from './components/admin/ActiveCatalog';
 import CustomerAccounts from './components/admin/CustomerAccounts';
 import CustomerList from './components/admin/CustomerList';
 import FullCatalog from './components/admin/FullCatalog';
@@ -37,7 +36,6 @@ function App() {
         <Route path='/accounts' element={<AccountForm  />} />
         <Route path='/accounts/specified-customer/?customer_id=:customerId' element={<AccountForm  />} />
         <Route path='/catalog' element={<FullCatalog  />} />
-        <Route path='/catalog/active-products' element={<ActiveCatalog  />} />
         <Route path='/catalog/stock-monitor' element={<StockMonitor  />} />
         <Route path='/catalog/update-stock/specified-product/?product_id=:productId' element={<UpdateStockForm  />} />
         <Route path='/customers' element={<CustomerList  />} />

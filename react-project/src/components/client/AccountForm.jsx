@@ -117,7 +117,7 @@ function AccountForm() {
                 </Button>
             </Form>
 
-            <Modal show={showSuccess} onHide={handleClose} centered >
+            <Modal show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Success</Modal.Title>
                 </Modal.Header>

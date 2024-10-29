@@ -22,15 +22,15 @@ function OrderForm() {
     const { customerId, orderId } = useParams();
     const navigate = useNavigate();
 
-    // useEffect(() => {
-    //     if (id) {
-    //         axios.get(`http://127.0.0.1:5000/products/${id}`)
-    //             .then(response => {
-    //                 setAccount(response.data);
-    //             })
-    //             .catch(error => setErrorMessage(error.message));
-    //     }
-    // }, [id]);
+    useEffect(() => {
+        if (orderId) {
+            axios.get(`http://127.0.0.1:5000/products/${id}`)
+                .then(response => {
+                    setOrderDetails(response.data);
+                })
+                .catch(error => setErrorMessage(error.message));
+        }
+    }, [orderId]);
 
     const handleAddInputs = () => {
         setOrderDetails([...orderDetails, { productId: '', productName: '' }]);
@@ -139,7 +139,7 @@ function OrderForm() {
                 </Button>
             </Form>
 
-            <Modal show={showSuccess} onHide={handleClose} centered >
+            <Modal show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Success</Modal.Title>
                 </Modal.Header>
