@@ -11,47 +11,55 @@ import { Form, Button, Alert, Modal, Spinner } from "react-bootstrap";
 import axios from "axios";
 
 function OrderForm() {
-    const [orderDetails, setOrderDetails] = useState([{ 
-        productId: '',
-        productName: ''
-     }]);
+    const [order, setOrder] = useState([]);
+    const [order_items, setOrderItems] = useState([{
+        product_id: '',
+        product_name: '',
+        quantity: '',
+        price_per_unit: ''
+    }])
     const [errors, setErrors] = useState([{}]);
+    const [isFetchingOrder, setIsFetchingOrder] = useState(false);
+    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isSubmitting, setSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const { customerId, orderId } = useParams();
+    const { customer_id, order_id } = useParams();
     const navigate = useNavigate();
+    const variantList = ['primary', 'info'];
 
     useEffect(() => {
-        if (orderId) {
-            axios.get(`http://127.0.0.1:5000/products/${id}`)
+        if (order_id) {
+            axios.get(`http://127.0.0.1:5000/orders/${order_id}`)
                 .then(response => {
-                    setOrderDetails(response.data);
+                    setOrder(response.data);
+                    setOrderItems(order.order_details);
                 })
                 .catch(error => setErrorMessage(error.message));
         }
-    }, [orderId]);
+    }, [order_id]);
 
     const handleAddInputs = () => {
-        setOrderDetails([...orderDetails, { productId: '', productName: '' }]);
+        setOrderItems([...order_items, { product_id: '', product_name: '', quantity: '', price_per_unit: '' }]);
     };
 
     const handleChange = (event, index) => {
         let { name, value } = event.target;
-        let onChangeValue = [...orderDetails];
+        let onChangeValue = [...order_items];
         onChangeValue[index][name] = value;
-        setOrderDetails(onChangeValue);
+        setOrderItems(onChangeValue);
     };
 
     const handleDeleteInput = (index) => {
-        const newDetails = [...orderDetails];
-        newDetails.splice(index, 1);
-        setOrderDetails(newDetails);
+        const newItems = [...order_items];
+        newItems.splice(index, 1);
+        setOrderItems(newItems);
     }
 
     const validateForm = () => {
         let errors = [{}];
-        if (!orderDetails.productId && !orderDetails.productName) errors.index = 'Either Product ID or Name is required';
+        if (!order_items.product_id && !order_items.product_name) errors.index = 'Either Product ID or Name is required';
+        if (order_items.quantity === '' ) errors.index = 'Quantity is required';
         setErrors(errors);
         return Object.keys(errors).length === 0;
     };
@@ -61,10 +69,10 @@ function OrderForm() {
         if (!validateForm()) return;
         setSubmitting(true);
         try {
-            if (orderId) {
-                await axios.put(`http://127.0.0.1:5000/orders/${orderId}`, orderDetails);
+            if (order_id) {
+                await axios.put(`http://127.0.0.1:5000/orders/${order_id}`, order_items);
             } else {
-                await axios.post(`http://127.0.0.1:5000/place-order/?customer_id=${customerId}`, orderDetails);
+                await axios.post(`http://127.0.0.1:5000/place-order/?customer_id=${customer_id}`, order_items);
             }
             setShowSuccess(true);
         } catch (error) {
@@ -74,12 +82,16 @@ function OrderForm() {
         }
     };
 
-
     const handleClose = () => {
         setShowSuccess(false);
-        setOrderDetails([{ productId: '', productName: '' }]);
+        setOrderDetails([{ 
+            product_id: '',
+            product_name: '',
+            quantity: '',
+            price_per_unit: ''
+         }]);
         setSubmitting(false);
-        navigate(`/orders/${orderId}`);
+        navigate(`/orders/${order_id}`);
     };
 
     if (isSubmitting) return 
@@ -144,7 +156,7 @@ function OrderForm() {
                     <Modal.Title>Success</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Order information has been successfully {orderId ? 'updated' : 'submitted'}!
+                    Order information has been successfully {order_id ? 'updated' : 'submitted'}!
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="outline-secondary" onClick={handleClose} >

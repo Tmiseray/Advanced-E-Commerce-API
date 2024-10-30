@@ -27,7 +27,7 @@ function ProductForm() {
         if (id) {
             axios.get(`http://127.0.0.1:5000/products/${id}`)
                 .then(response => {
-                    setAccount(response.data);
+                    setProduct(response.data);
                 })
                 .catch(error => setErrorMessage(error.message));
         }

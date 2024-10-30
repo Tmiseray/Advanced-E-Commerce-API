@@ -41,6 +41,20 @@ img:hover {
   box-shadow: 0 0 13px 7px lemonchiffon;
 }
 
+.listgroupItems {
+  background-color: initial;
+  border-color: initial;
+  color: initial;
+  transition: initial;
+}
+
+.listgroupItems:hover {
+  background-color: transparent;
+  border-color: yellow;
+  color: rgb(211, 171, 255);
+  transition: ease-in-out .3s;
+}
+
 .shopBtn {
   width: 100%;
   font-size: 20px;

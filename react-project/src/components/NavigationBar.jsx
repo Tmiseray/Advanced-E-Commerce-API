@@ -49,7 +49,7 @@ function NavigationBar() {
                     }
                     {isLoggedIn
                         ? (username ==='admin' 
-                            ? <Nav.Link as={NavLink} to='/catalog' className="navLink" activeclassname='active' >
+                            ? <Nav.Link as={NavLink} to='/orders' className="navLink" activeclassname='active' >
                                 Orders
                             </Nav.Link>
                             : <Nav.Link as={NavLink} to={`/orders/history-for-customer/${id}`} className="navLink" activeclassname='active' >
@@ -65,7 +65,7 @@ function NavigationBar() {
                             : <Nav.Link as={NavLink} to={`/customer-profile/${id}`} className="navLink" activeclassname='active' >
                                 Profile
                             </Nav.Link>)
-                        : <Nav.Link as={NavLink} to='/customers' className="navLink" activeclassname='active' >
+                        : <Nav.Link as={NavLink} to='/register' className="navLink" activeclassname='active' >
                             Account Creation
                         </Nav.Link>
                     }  {/* Maybe adjust to /account-creation instead of customers */}

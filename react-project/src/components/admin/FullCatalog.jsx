@@ -16,21 +16,27 @@ import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
 function FullCatalog() {
     const [products, setProducts] = useState([]);
-    const [details, setDetails] = useState([]);
-    const [isFetchingCatalog, setFetchCatalog] = useState(false);
-    const [isFetchingDetails, setFetchDetails] = useState(false);
+    // const [details, setDetails] = useState([]);
+    const [deactivateMessage, setDeactivateMessage] = useState('');
+    const [isFetchingCatalog, setIsFetchingCatalog] = useState(false);
+    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
+    const [isDeactivating, setIsDeactivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    const { productId } = useParams();
+    const [expandedDetails, setExpandedDetails] = useState(null);
+    const [currentVariant, setCurrentVariant] = useState('primary');
+    const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const variantList = ['primary', 'info'];
 
-    const fetchProducts = async () => {
-        setFetchCatalog(true);
-        setError(null);
+
+    const fetchCatalog = async () => {
+        setIsFetchingCatalog(true);
+        setError('');
 
         const timeoutDuration = 10000;
         const timeoutId = setTimeout(() => {
-            setFetchCatalog(false);
+            setIsFetchingCatalog(false);
         }, timeoutDuration);
 
         try {
@@ -40,48 +46,72 @@ function FullCatalog() {
             setError('Error fetching products:', error)
         } finally {
             clearTimeout(timeoutId);
-            setFetchCatalog(false);
+            setIsFetchingCatalog(false);
         }
     };
 
-    const fetchDetails = async (productId) => {
-        setFetchDetails(true);
-        setError(null);
+    const fetchDetails = async (id) => {
+        setIsFetchingDetails(true);
+        setError('');
 
         const timeoutDuration = 5000;
         const timeoutId = setTimeout(() => {
-            setFetchDetails(false);
+            setIsFetchingDetails(false);
         }, timeoutDuration);
 
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/products/${productId}`);
-            setDetails(response.data);
+            const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
+            setExpandedDetails(response.data);
         } catch (error) {
-            setError('Error fetching product details:', error)
+            setError('Error fetching product details:', error);
         } finally {
             clearTimeout(timeoutId);
-            setFetchDetails(false);
+            setIsFetchingDetails(false);
         }
     };
 
-    const showDetails = (productId) => {
-        fetchDetails(productId);
-        return (
-            <>
-                {details.map(detail => (
-                    <ListGroup horizontal >
-                        <ListGroup.Item variant='primary' > </ListGroup.Item>
-                        <ListGroup.Item action variant='info' >{detail.name} </ListGroup.Item>
-                        <ListGroup.Item action variant='success' > ${detail.price} </ListGroup.Item>
+    const handleClose = () => {
+        if (isDeactivating) {
+            setIsDeactivating(false);
+        }
+        setShowRedirect(false);
+    };
 
-                    </ListGroup>
-                ))}
-            </>
-        );
+    const handleEditProduct = (id) => {
+        setShowRedirect(true);
+        navigate(`/products/${id}`);
+    };
+
+    const handleUpdateStock = (id) => {
+        setShowRedirect(true);
+        navigate(`/catalog/update-stock/${id}`);
+    };
+
+    const handleDeactivation = async (id) => {
+        setIsDeactivating(true);
+        setError('');
+
+        try {
+            const response = await axios.put(`http://127.0.0.1:5000/products/deactivate/${id}`);
+            setDeactivateMessage(response.data);
+        } catch (error) {
+            setError('Error deactivating product:', error);
+        } finally {
+            setIsDeactivating(false);
+        }
+    };
+
+    const toggleDetails = (id, variant) => {
+        if (expandedDetails.id === id) {
+            setExpandedDetails(null);
+        } else {
+            fetchDetails(id);
+            setCurrentVariant(variant);
+        }
     };
 
     useEffect(() => {
-        fetchProducts();
+        fetchCatalog();
     }, []);
 
     if (isFetchingCatalog) return 
@@ -100,29 +130,63 @@ function FullCatalog() {
             <Spinner animation="grow" size="sm" /> 
         </p>;
 
+    if (isDeactivating) return
+        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal.Header>
+                <Modal.Title>Deactivation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                Deactivating Product 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant='outline-secondary' onClick={handleClose} >
+                    Continue
+                </Button>
+            </Modal.Footer>
+        </Modal>;
+
     return (
         <Container>
             <h3>Full Catalog</h3>
-                {products.map(product => (
-                    <ListGroup key={product.id} horizontal >
-                        <ListGroup.Item action variant='primary'>ID: {product.id} </ListGroup.Item>
-                        <ListGroup.Item action variant='info'>Stock Total: {product.product_stock} </ListGroup.Item>
-                        <ListGroup.Item action variant='warning'>Last Restock Date: {product.last_restock_date} </ListGroup.Item>
-                        <ListGroup.Item action variant='light' onClick={showDetails(product.id)} >Show Details</ListGroup.Item>
-                        <ListGroup.Item action variant='secondary' onClick={navigate(`/catalog/update-stock/specified-product/?product_id=${product.id}`)} >Update Stock</ListGroup.Item>
-                    </ListGroup>
-                ))}
+                {error && <p className='text-danger'>{error}</p>}
+                {products.map(product => {
+                    const variant = variantList[index % variantList.length];
+                    return (
+                        <div key={product.id} >
+                            <ListGroup horizontal >
+                                <ListGroup.Item action variant={variant}>ID: {product.id} </ListGroup.Item>
+                                <ListGroup.Item action variant={variant}>Stock Total: {product.product_stock} </ListGroup.Item>
+                                <ListGroup.Item action variant={variant}>Last Restock Date: {product.last_restock_date} </ListGroup.Item>
+                                <ListGroup.Item action variant='light' onClick={() => toggleDetails(product.id, variant)} >Show Details</ListGroup.Item>
+                                <ListGroup.Item action variant='warning' onClick={() => handleUpdateStock(product.id)} >Update Stock</ListGroup.Item>
+                            </ListGroup>
+                            {expandedDetails.id === product.id && (
+                                <ListGroup horizontal>
+                                    <ListGroup.Item action variant={currentVariant} >Additional Details</ListGroup.Item>
+                                    <ListGroup.Item action variant={currentVariant}>Product: {expandedDetails.name} </ListGroup.Item>
+                                    <ListGroup.Item action variant={currentVariant}>Price: ${expandedDetails.price} </ListGroup.Item>
+                                    <ListGroup.Item action variant='warning' onClick={() => handleEditProduct(expandedDetails.id)}>Edit Details</ListGroup.Item>
+                                    <ListGroup.Item action variant='danger' onClick={() => handleDeactivation(expandedDetails.id)}>Deactivate Product</ListGroup.Item>
+                                </ListGroup>
+                            )}
+
+                        </div>
+                    )}
+                )}
 
             <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title>Redirect</Modal.Title>
+                    <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Redirecting you to {customerId ? 'place an order' : 'login'} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
+                    Redirecting you to update Product ID: {products.id} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant='outline-secondary' onClick={setShowRedirect(false)} >
-                        Back to Products
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Back to Catalog
                     </Button>
                     <Button variant='outline-primary' onClick={handleClose} >
                         Continue

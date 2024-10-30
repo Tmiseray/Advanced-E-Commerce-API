@@ -16,15 +16,17 @@ function ProductList() {
     const { customerId } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const variantList = ['primary', 'info'];
+
 
     const fetchProducts = async () => {
         setIsFetching(true);
         setError('');
 
-        // const timeoutDuration = 10000;
-        // const timeoutId = setTimeout(() => {
-        //     setFetch(false);
-        // }, timeoutDuration);
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+            setFetch(false);
+        }, timeoutDuration);
 
         try {
             const response = await axios.get('http://127.0.0.1:5000/products/active-products');
@@ -32,7 +34,7 @@ function ProductList() {
         } catch (error) {
             setError('Error fetching products:', error)
         } finally {
-            // clearTimeout(timeoutId);
+            clearTimeout(timeoutId);
             setIsFetching(false);
         }
     };
@@ -65,13 +67,16 @@ function ProductList() {
                 {products.length === 0 ? (
                     <p>No products available.</p>
                 ) : (
-                    products.map(product => (
+                    products.map((product, index) => {
+                        const currentVariant = variantList[index % variantList.length];
+                        return (
                         <ListGroup key={product.id} horizontal onClick={() => setShowRedirect(true)} >
-                            <ListGroup.Item action variant='primary'>ID: {product.id} </ListGroup.Item>
-                            <ListGroup.Item action variant='info'>{product.name} </ListGroup.Item>
-                            <ListGroup.Item action variant='success'> ${product.price} </ListGroup.Item>
+                            <ListGroup.Item action variant={currentVariant}>ID: {product.id} </ListGroup.Item>
+                            <ListGroup.Item action variant={currentVariant}>{product.name} </ListGroup.Item>
+                            <ListGroup.Item action variant={currentVariant}> ${product.price} </ListGroup.Item>
                         </ListGroup>
-                    ))
+                        );
+                    })
                 )}
 
             <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >

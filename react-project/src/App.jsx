@@ -28,10 +28,6 @@ import './App.css';
 import { useEffect, useState } from 'react';
 
 function App() {
-  // let name = useState('');
-  // let username = useState('');
-  // let password = useState('');
-  // let isLoggedIn = useState(false);
 
   useEffect(() => {
     sessionStorage.setItem('name', '');
@@ -47,22 +43,23 @@ function App() {
       <Routes>
         <Route path='/' element={<HomePage  />} />
         <Route path='/login' element={<LoginForm  />} />
-        <Route path='/accounts' element={<AccountForm  />} />
-        <Route path='/accounts/specified-customer/?customer_id=:customerId' element={<AccountForm  />} />
+        <Route path='/create-account' element={<AccountForm  />} />
+        <Route path='/accounts/:id' element={<AccountForm  />} />
         <Route path='/catalog' element={<FullCatalog  />} />
         <Route path='/catalog/stock-monitor' element={<StockMonitor  />} />
-        <Route path='/catalog/update-stock/specified-product/?product_id=:productId' element={<UpdateStockForm  />} />
+        <Route path='/catalog/update-stock/:id' element={<UpdateStockForm  />} />
         <Route path='/customers' element={<CustomerList  />} />
-        <Route path='/customers' element={<CustomerForm  />} />
-        <Route path='/customers/:customerId' element={<CustomerForm  />} />
+        <Route path='/register' element={<CustomerForm  />} />
+        <Route path='/customers/:id' element={<CustomerForm  />} />
         <Route path='/customer-profile/:id' element={<CustomerProfile />} />
         <Route path='/orders' element={<OrderList  />} />
-        <Route path='/orders/:orderId' element={<OrderDetails  />} />
-        <Route path='/orders/history-for-customer/?customer_id=:customerId' element={<OrderHistory  />} />
-        <Route path='/orders/track-status/?order_id=:orderId&customer_id=:customerId' element={<TrackOrder  />} />
+        <Route path='/orders/:id' element={<OrderDetails  />} />
+        <Route path='/orders/history-for-customer/:id' element={<OrderHistory  />} />
+        <Route path='/orders/track-status/?customer_id=:customer_id&order_id=:order_id' element={<TrackOrder  />} />
         <Route path='/place-order' element={<OrderForm  />} />
-        <Route path='/products' element={<ProductForm  />} />
-        <Route path='/products/:productId' element={<ProductForm  />} />
+        <Route path='/orders/:id' element={<OrderForm  />} />
+        <Route path='/add-product' element={<ProductForm  />} />
+        <Route path='/products/:id' element={<ProductForm  />} />
         <Route path='/products/active-products' element={<ProductList  />} />
         <Route path='*' element={<NotFound  />} />
       </Routes>
