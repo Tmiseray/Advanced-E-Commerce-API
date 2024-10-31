@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { object, func } from 'prop-types';
-import { Container, Form, Button, Alert, Modal, Spinner } from "react-bootstrap";
+import { Container, Form, Button, Alert, Modal, Spinner, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 function ProductForm() {
@@ -89,43 +89,49 @@ function ProductForm() {
     return (
         <Container>
             <Form onSubmit={handleSubmit} >
-                <h3>{id ? 'Edit' : 'Add'} Product Information</h3>
+                <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Product Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
-                <Form.Group controlId="productName" >
-                    <Form.Label>Product Name:</Form.Label>
-                    <Form.Control 
-                        type="text"
-                        name="productName"
-                        value={product.name}
-                        onChange={handleChange}
-                        isInvalid={!!errors.name}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.name}
-                    </Form.Control.Feedback>
+                <Form.Group as={Row} className="mb-2 p-3" controlId="productName" >
+                    <Form.Label column sm={2} className="fs-4" >Product Name:</Form.Label>
+                    <Col sm={10} >
+                        <Form.Control 
+                            className="pb-0"
+                            type="text"
+                            name="productName"
+                            value={product.name}
+                            onChange={handleChange}
+                            isInvalid={!!errors.name}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.name}
+                        </Form.Control.Feedback>
+                    </Col>
                 </Form.Group>
-                <Form.Group controlId="productPrice" >
-                    <Form.Label>Price:</Form.Label>
-                    <Form.Control 
-                        type="number"
-                        name="productPrice"
-                        value={product.price}
-                        onChange={handleChange}
-                        isInvalid={!!errors.price}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.price}
-                    </Form.Control.Feedback>
+                <Form.Group as={Row} className="mb-3 p-3" controlId="productPrice" >
+                    <Form.Label column sm={2} className="fs-4" >Price:</Form.Label>
+                    <Col sm={10} >
+                        <Form.Control 
+                            className="pb-0"
+                            type="number"
+                            name="productPrice"
+                            value={product.price}
+                            onChange={handleChange}
+                            isInvalid={!!errors.price}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.price}
+                        </Form.Control.Feedback>
+                    </Col>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" disabled={isSubmitting} >
+                <Button className="w-100 fs-4" variant="outline-info" type="submit" disabled={isSubmitting} >
                     {isSubmitting ? <Spinner as='span' animation="border" size="sm" /> : 'Submit' }
                 </Button>
             </Form>
 
-            <Modal show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title>Success</Modal.Title>
+                    <Modal.Title className="text-success">Success</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Product information has been successfully {id ? 'updated' : 'added'}!

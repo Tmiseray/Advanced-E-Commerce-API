@@ -1,8 +1,11 @@
 
+import { Container } from "react-bootstrap";
 
 function OrderDetails() {
     return (
-        <div></div>
+        <Container>
+            <p>Work in progress</p>
+        </Container>
     );
 };
 

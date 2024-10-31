@@ -22,7 +22,7 @@ function FullCatalog() {
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeactivating, setIsDeactivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    const [expandedDetails, setExpandedDetails] = useState(null);
+    const [expandedDetails, setExpandedDetails] = useState([]);
     const [currentVariant, setCurrentVariant] = useState('primary');
     const { id } = useParams();
     const [error, setError] = useState('');
@@ -102,8 +102,8 @@ function FullCatalog() {
     };
 
     const toggleDetails = (id, variant) => {
-        if (expandedDetails.id === id) {
-            setExpandedDetails(null);
+        if (expandedDetails && expandedDetails.id === id) {
+            setExpandedDetails([]);
         } else {
             fetchDetails(id);
             setCurrentVariant(variant);
@@ -150,23 +150,25 @@ function FullCatalog() {
 
     return (
         <Container>
-            <h3>Full Catalog</h3>
+            <h3 className='fs-1 text-warning'>Full Catalog</h3>
                 {error && <p className='text-danger'>{error}</p>}
-                {products.map(product => {
+                {products.map((product, index) => {
                     const variant = variantList[index % variantList.length];
                     return (
-                        <div key={product.id} >
+                        <div key={product.product_id} >
                             <ListGroup horizontal >
-                                <ListGroup.Item action variant={variant}>ID: {product.id} </ListGroup.Item>
+                                <ListGroup.Item action variant={variant}>ID: {product.product_id} </ListGroup.Item>
                                 <ListGroup.Item action variant={variant}>Stock Total: {product.product_stock} </ListGroup.Item>
-                                <ListGroup.Item action variant={variant}>Last Restock Date: {product.last_restock_date} </ListGroup.Item>
-                                <ListGroup.Item action variant='light' onClick={() => toggleDetails(product.id, variant)} >Show Details</ListGroup.Item>
-                                <ListGroup.Item action variant='warning' onClick={() => handleUpdateStock(product.id)} >Update Stock</ListGroup.Item>
+                                <ListGroup.Item action variant={variant}>Last Restock Date: <br /> {product.last_restock_date} </ListGroup.Item>
+                                <ListGroup.Item action variant='secondary' onClick={() => toggleDetails(product.product_id, variant)} >
+                                    {expandedDetails && expandedDetails.id === product.product_id ? 'Hide Details' : 'Show Details'}
+                                </ListGroup.Item>
+                                <ListGroup.Item action variant='success' onClick={() => handleUpdateStock(product.product_id)} >Update Stock</ListGroup.Item>
                             </ListGroup>
-                            {expandedDetails.id === product.id && (
+                            {expandedDetails.id === product.product_id && (
                                 <ListGroup horizontal>
-                                    <ListGroup.Item action variant={currentVariant} >Additional Details</ListGroup.Item>
-                                    <ListGroup.Item action variant={currentVariant}>Product: {expandedDetails.name} </ListGroup.Item>
+                                    <ListGroup.Item action variant='transparent' >  </ListGroup.Item>
+                                    <ListGroup.Item action variant={currentVariant}> {expandedDetails.name} </ListGroup.Item>
                                     <ListGroup.Item action variant={currentVariant}>Price: ${expandedDetails.price} </ListGroup.Item>
                                     <ListGroup.Item action variant='warning' onClick={() => handleEditProduct(expandedDetails.id)}>Edit Details</ListGroup.Item>
                                     <ListGroup.Item action variant='danger' onClick={() => handleDeactivation(expandedDetails.id)}>Deactivate Product</ListGroup.Item>
@@ -177,7 +179,7 @@ function FullCatalog() {
                     )}
                 )}
 
-            <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>

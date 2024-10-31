@@ -1,5 +1,6 @@
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useNavigate } from 'react-router-dom';
 // Admin Components
+import AdminProfile from './components/admin/AdminProfile';
 import CustomerAccounts from './components/admin/CustomerAccounts';
 import CustomerList from './components/admin/CustomerList';
 import FullCatalog from './components/admin/FullCatalog';
@@ -26,28 +27,87 @@ import TrackOrder from './components/TrackOrder';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { useEffect, useState } from 'react';
+import { Modal, Button } from 'react-bootstrap';
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(() => JSON.parse(sessionStorage.getItem('isLoggedIn')) || false);
+  const [isAdmin, setIsAdmin] = useState(() => JSON.parse(sessionStorage.getItem('isAdmin')) || false);
+  const [showLogoutMessage, setShowLogoutMessage] = useState(false);
+  const [name, setName] = useState('');
+  const navigate = useNavigate();
 
   useEffect(() => {
     sessionStorage.setItem('name', '');
-    sessionStorage.setItem('customerId', '')
+    sessionStorage.setItem('id', '')
     sessionStorage.setItem('username', '');
-    sessionStorage.setItem('password', '');
-    sessionStorage.setItem('isLoggedIn', false);
-  });
+    sessionStorage.setItem('isLoggedIn', JSON.stringify(false));
+    sessionStorage.setItem('isAdmin', JSON.stringify(false));
+  }, []);
+
+  const handleLogin = (userData) => {
+    setName(userData.name);
+    setIsLoggedIn(true);
+    setIsAdmin(userData.isAdmin);
+    sessionStorage.setItem('name', userData.name);
+    sessionStorage.setItem('id', userData.id);
+    sessionStorage.setItem('username', userData.username);
+    sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
+    sessionStorage.setItem('isAdmin', JSON.stringify(userData.isAdmin));
+
+    handleSuccessLogin(userData.isAdmin, userData.id);
+  }
+
+  const handleSuccessLogin = (isAdmin, id) => {
+    if (isAdmin || id === 6) {
+        navigate('/admin-profile');
+    } else {
+        navigate(`/customer-profile/${id}`);
+    }
+  };
+
+  const handleLogout = async () => {
+    const storedName = sessionStorage.getItem('name');
+    if (storedName) {
+        setName(JSON.parse(storedName));
+    }
+    setShowLogoutMessage(true);
+    
+    await axios.get('http://127.0.0.1:5000/logout');
+
+    sessionStorage.clear();
+    setIsLoggedIn(false);
+    setIsAdmin(false);
+    setName('');
+  };
+
+  const handleSuccessLogout = () => {
+    setShowLogoutMessage(false);
+    navigate('/login');
+  }
 
   return (
     <>
-      <NavigationBar />
+      <NavigationBar isLoggedIn={isLoggedIn} isAdmin={isAdmin} handleLogout={handleLogout} />
+      <Modal className="text-center" show={showLogoutMessage} onHide={() => setShowLogoutMessage(false)} backdrop='static' keyboard={false} centered >
+          <Modal.Header closeButton>
+            <Modal.Title className='text-info' >Goodbye!</Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            Goodbye, {name}! <br /> You have been logged out.
+          </Modal.Body>
+          <Modal.Footer>
+              <Button variant="outline-primary" onClick={handleSuccessLogout}>OK</Button>
+          </Modal.Footer>
+      </Modal>
       <Routes>
         <Route path='/' element={<HomePage  />} />
-        <Route path='/login' element={<LoginForm  />} />
-        <Route path='/create-account' element={<AccountForm  />} />
+        <Route path='/login' element={<LoginForm handleLogin={handleLogin} handleSuccessLogin={handleSuccessLogin} />} />
+        <Route path='/admin-profile' element={<AdminProfile />} />
+        <Route path='/create-account/:newId' element={<AccountForm  />} />
         <Route path='/accounts/:id' element={<AccountForm  />} />
         <Route path='/catalog' element={<FullCatalog  />} />
-        <Route path='/catalog/stock-monitor' element={<StockMonitor  />} />
-        <Route path='/catalog/update-stock/:id' element={<UpdateStockForm  />} />
+        <Route path='/stock-monitor' element={<StockMonitor  />} />
+        <Route path='/update-stock/:id' element={<UpdateStockForm  />} />
         <Route path='/customers' element={<CustomerList  />} />
         <Route path='/register' element={<CustomerForm  />} />
         <Route path='/customers/:id' element={<CustomerForm  />} />

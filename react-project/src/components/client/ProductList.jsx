@@ -79,7 +79,7 @@ function ProductList() {
                     })
                 )}
 
-            <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirect</Modal.Title>
                 </Modal.Header>

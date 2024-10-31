@@ -5,9 +5,13 @@
 
 */
 
+import { Container } from "react-bootstrap";
+
 function StockMonitor() {
     return (
-        <div></div>
+        <Container>
+            <p>Work in progress</p>
+        </Container>
     );
 };
 

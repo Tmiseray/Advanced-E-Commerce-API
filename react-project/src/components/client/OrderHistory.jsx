@@ -6,9 +6,13 @@
 
 */
 
+import { Container } from "react-bootstrap";
+
 function OrderHistory() {
     return (
-        <div></div>
+        <Container>
+            <p>Work in progress</p>
+        </Container>
     );
 };
 

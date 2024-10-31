@@ -8,7 +8,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { object, func } from 'prop-types';
-import { Form, Button, Alert, Modal, Spinner, Container } from "react-bootstrap";
+import { Form, Button, Alert, Modal, Spinner, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 function CustomerForm() {
@@ -17,6 +17,7 @@ function CustomerForm() {
         email: '',
         phone: ''
      });
+    const [newId, setNewId] = useState('');
     const [errors, setErrors] = useState({});
     const [isSubmitting, setSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
@@ -26,7 +27,7 @@ function CustomerForm() {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://127.0.0.1:5000/customers/specified-id/?id=${id}`)
+            axios.get(`http://127.0.0.1:5000/customers/${id}`)
                 .then(response => {
                     setCustomer(response.data);
                 })
@@ -51,14 +52,20 @@ function CustomerForm() {
             if (id) {
                 await axios.put(`http://127.0.0.1:5000/customers/${id}`, customer);
             } else {
-                await axios.post('http://127.0.0.1:5000/customers', customer);
+                const response = await axios.post('http://127.0.0.1:5000/register', customer);
+                const customerId = response.data.customer_id;
+                setNewId(customerId);
             }
             setShowSuccess(true);
             // Possibly add code here to redirect
             // if (id) => LoginForm
             // else => AccountForm
         } catch (error) {
-            setErrorMessage(error.message);
+            if (error.response) {
+                setErrorMessage(error.response.data);
+            } else {
+                setErrorMessage(error.message);
+            }
         } finally {
             setSubmitting(false);
         }
@@ -79,7 +86,7 @@ function CustomerForm() {
         if (id) {
             navigate(`/customer-profile/${id}`);
         } else {
-            navigate('/accounts');
+            navigate(`/create-account/${newId}`);
         }
     };
 
@@ -95,56 +102,68 @@ function CustomerForm() {
     return (
         <Container>
             <Form onSubmit={handleSubmit} >
-                <h3>{id ? 'Edit' : 'Add'} Contact Information</h3>
+                <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Contact Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
-                <Form.Group controlId="customerName" >
-                    <Form.Label>Name:</Form.Label>
-                    <Form.Control 
-                        type="text"
-                        name="name"
-                        value={customer.name}
-                        onChange={handleChange}
-                        isInvalid={!!errors.name}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.name}
-                    </Form.Control.Feedback>
+                <Form.Group as={Row} className="mb-3 p-3" controlId="name" >
+                    <Form.Label column sm={2} className="fs-4" >Name:</Form.Label>
+                    <Col sm={10} >
+                        <Form.Control
+                            className="pb-0"
+                            size="lg"
+                            type="text"
+                            name="name"
+                            value={customer.name}
+                            onChange={handleChange}
+                            isInvalid={!!errors.name}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.name}
+                        </Form.Control.Feedback>
+                    </Col>
                 </Form.Group>
-                <Form.Group controlId="customerEmail" >
-                    <Form.Label>Email:</Form.Label>
-                    <Form.Control 
-                        type="email"
-                        name="email"
-                        value={customer.email}
-                        onChange={handleChange}
-                        isInvalid={!!errors.email}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.email}
-                    </Form.Control.Feedback>
+                <Form.Group as={Row} className="mb-3 p-3" controlId="email" >
+                    <Form.Label column sm={2} className="fs-4" >Email:</Form.Label>
+                    <Col sm={10} >
+                        <Form.Control 
+                            className="pb-0"
+                            size="lg"
+                            type="email"
+                            name="email"
+                            value={customer.email}
+                            onChange={handleChange}
+                            isInvalid={!!errors.email}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.email}
+                        </Form.Control.Feedback>
+                    </Col>
                 </Form.Group>
-                <Form.Group controlId="customerPhone" >
-                    <Form.Label>Phone:</Form.Label>
-                    <Form.Control 
-                        type="tel"
-                        name="phone"
-                        value={customer.phone}
-                        onChange={handleChange}
-                        isInvalid={!!errors.phone}
-                    />
-                    <Form.Control.Feedback type="invalid">
-                        {errors.phone}
-                    </Form.Control.Feedback>
+                <Form.Group as={Row} className="mb-3 p-3" controlId="phone" >
+                    <Form.Label column sm={2} className="fs-4" >Phone:</Form.Label>
+                    <Col sm={10} >
+                        <Form.Control 
+                            className="pb-0"
+                            size="lg"
+                            type="tel"
+                            name="phone"
+                            value={customer.phone}
+                            onChange={handleChange}
+                            isInvalid={!!errors.phone}
+                        />
+                        <Form.Control.Feedback type="invalid">
+                            {errors.phone}
+                        </Form.Control.Feedback>
+                    </Col>
                 </Form.Group>
 
-                <Button variant="primary" type="submit" disabled={isSubmitting} >
+                <Button className="w-100 fs-4" variant="outline-info" type="submit" disabled={isSubmitting} >
                     {isSubmitting ? <Spinner as='span' animation="border" size="sm" /> : 'Submit' }
                 </Button>
             </Form>
 
-            <Modal show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title>Success</Modal.Title>
+                    <Modal.Title className="text-success" >Success</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Contact information has been successfully {id ? 'updated' : 'added'}!

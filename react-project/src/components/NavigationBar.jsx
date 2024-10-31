@@ -1,27 +1,34 @@
 /*
 
 */
-
-import { NavLink } from "react-router-dom";
+import { func } from 'prop-types';
+import { NavLink, useParams } from "react-router-dom";
 import { Navbar, Nav, Image } from "react-bootstrap";
 import { useEffect, useState } from "react";
 
-function NavigationBar() {
-    const [ isLoggedIn, setIsLoggedIn ] = useState(false);
-    const [ username, setUsername ] = useState('');
-    const loginStatusKey = 'isLoggedIn';
-    const usernameKey = 'username';
+function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
+    // const [ isLoggedIn, setIsLoggedIn ] = useState(false);
+    // const [ isAdmin, setIsAdmin ] = useState(false);
 
-    useEffect(() => {
-        const storedLoginStatus = sessionStorage.getItem(loginStatusKey);
-        const storedUsername = sessionStorage.getItem(usernameKey);
-        if (storedLoginStatus) {
-            setIsLoggedIn(JSON.parse(storedLoginStatus));
-        }
-        if (storedUsername) {
-            setUsername(JSON.parse(storedUsername));
-        }
-    }, []);
+    // useEffect(() => {
+    //     const storedLoginStatus = sessionStorage.getItem('isLoggedIn');
+    //     const adminStatus = sessionStorage.getItem('isAdmin');
+
+    //     if (storedLoginStatus) {
+    //         setIsLoggedIn(JSON.parse(storedLoginStatus));
+    //     } else {
+    //         setIsLoggedIn(false);
+    //     }
+
+    //     if (adminStatus) {
+    //         setIsAdmin(JSON.parse(adminStatus));
+    //     } else {
+    //         setIsAdmin(false);
+    //     }
+
+    // }, [isLoggedIn, isAdmin]);
+
+    const id = sessionStorage.getItem('id');
 
     return (
         <Navbar bg='black' expand='lg' className="mb-5" >
@@ -34,21 +41,26 @@ function NavigationBar() {
                     <Nav.Link as={NavLink} to='/' className="navLink" activeclassname='active' >
                         Home
                     </Nav.Link>
-                    {isLoggedIn && username ==='admin' 
-                        ? <Nav.Link as={NavLink} to='/catalog' className="navLink" activeclassname='active' >
-                            Catalog
-                        </Nav.Link>
+                    {isLoggedIn  
+                        ? (isAdmin 
+                            ? <Nav.Link as={NavLink} to='/catalog' className="navLink" activeclassname='active' >
+                                Catalog
+                            </Nav.Link>
+                            : <Nav.Link as={NavLink} to='/products/active-products' className="navLink" activeclassname='active' >
+                                Products
+                            </Nav.Link>
+                        )
                         : <Nav.Link as={NavLink} to='/products/active-products' className="navLink" activeclassname='active' >
                             Products
                         </Nav.Link>
                     }
-                    {username ==='admin' 
-                        && <Nav.Link as={NavLink} to='/catalog/stock-monitor' className="navLink" activeclassname='active' >
+                    {isAdmin 
+                        && <Nav.Link as={NavLink} to='/stock-monitor' className="navLink" activeclassname='active' >
                             Stock Monitor
                         </Nav.Link>
                     }
                     {isLoggedIn
-                        ? (username ==='admin' 
+                        ? (isAdmin 
                             ? <Nav.Link as={NavLink} to='/orders' className="navLink" activeclassname='active' >
                                 Orders
                             </Nav.Link>
@@ -58,7 +70,7 @@ function NavigationBar() {
                         : ''
                     }
                     {isLoggedIn 
-                        ? (username === 'admin'
+                        ? (isAdmin
                             ? <Nav.Link as={NavLink} to='/customers' className="navLink" activeclassname='active' >
                                 Customers
                             </Nav.Link>
@@ -70,7 +82,7 @@ function NavigationBar() {
                         </Nav.Link>
                     }  {/* Maybe adjust to /account-creation instead of customers */}
                     {isLoggedIn 
-                        ? <Nav.Link as={NavLink} to='/logout' className="navLink" activeclassname='active' >
+                        ? <Nav.Link onClick={handleLogout}  className="navLink" activeclassname='active' >
                             Logout
                         </Nav.Link>
                         : <Nav.Link as={NavLink} to='/login' className="navLink" activeclassname='active' >
@@ -82,5 +94,9 @@ function NavigationBar() {
         </Navbar>
     );
 };
+
+NavigationBar.propTypes = {
+    handleLogout: func
+}
 
 export default NavigationBar;

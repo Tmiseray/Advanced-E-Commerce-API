@@ -1,9 +1,12 @@
 
+import { Container } from "react-bootstrap";
 
 
 function TrackOrder() {
     return (
-        <div></div>
+        <Container>
+            <p>Work in progress</p>
+        </Container>
     );
 };
 

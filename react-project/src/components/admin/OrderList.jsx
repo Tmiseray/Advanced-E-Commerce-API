@@ -142,7 +142,7 @@ function OrderList() {
         <Container>
             <h3>Customers' Orders</h3>
                 {error && <p className='text-danger'>{error}</p>}
-                {orders.map(order => {
+                {orders.map((order, index) => {
                     const variant = variantList[index % variantList.length];
                     return (
                         <div key={order.id} >
@@ -173,7 +173,7 @@ function OrderList() {
                     )}
                 )}
 
-            <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>

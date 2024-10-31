@@ -151,7 +151,7 @@ function CustomerList() {
                 {customers.length === 0 ? (
                     <p>No customers registered.</p>
                 ) : (
-                    customers.map(customer => {
+                    customers.map((customer, index) => {
                         const variant = variantList[index % variantList.length];
                         return (
                             <div key={customer.id} >
@@ -177,7 +177,7 @@ function CustomerList() {
                     })
                 )}
 
-            <Modal show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>

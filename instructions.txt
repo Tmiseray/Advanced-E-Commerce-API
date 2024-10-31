@@ -68,3 +68,14 @@ Submission:
 Upon completing the project, submit your code, including all source code files, and the README.md file in your GitHub repository to your instructor or designated platform.
 
 NOTE: Ensure that all code in your file is ready to run. This means that when your code is cloned down, we should be able to install the dependencies and run the react app. Your components should be implemented and all code should run as expected and asked for in the assignment.
+
+
+
+Admin Login Info:
+
+ID: 6
+Name: Main Admin
+Email: Main.Admin@EmpireLuxAdmin.com
+Phone: 1234567890
+Username: admin#1A
+Password: administration#1A

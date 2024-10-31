@@ -16,7 +16,7 @@ function HomePage() {
                     <h1 className="text-decoration-underline text-warning mb-3" >
                         EMPIRE LUX
                     </h1>
-                    <p className="text-warning-emphasis mt-0 mb-5" >
+                    <p className="text-warning-emphasis h3 mt-0 mb-5" >
                         Reign Supreme
                     </p>
                     <p>We offer a wide variety of regal products for an affordable price!</p>

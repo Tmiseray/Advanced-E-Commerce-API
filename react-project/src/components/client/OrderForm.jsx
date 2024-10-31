@@ -109,51 +109,73 @@ function OrderForm() {
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
                 {orderDetails.map((item, index) => (
                     <div className="detailsContainer" key={index} >
-                        <Form.Group controlId="productId" >
-                            <Form.Label>Product ID:</Form.Label>
-                            <Form.Control 
-                                type="number"
-                                name="productId"
-                                value={item.productId}
-                                onChange={(event) => handleChange(event, index)}
-                                isInvalid={!!errors.index}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {errors.index}
-                            </Form.Control.Feedback>
+                        <Form.Group as={Row} className="mb-3 p-3" controlId="quantity" >
+                            <Form.Label column sm={2} className="fs-4" >Quantity:</Form.Label>
+                            <Col sm={10} >
+                                <Form.Control 
+                                    className="pb-0"
+                                    type="number"
+                                    name="quantity"
+                                    value={item.quantity}
+                                    onChange={(event) => handleChange(event, index)}
+                                    isInvalid={!!errors.index}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.index}
+                                </Form.Control.Feedback>
+                            </Col>
                         </Form.Group>
-                        <Form.Group controlId="productName" >
-                            <Form.Label>Product Name:</Form.Label>
-                            <Form.Control 
-                                type="text"
-                                name="productName"
-                                value={item.productName}
-                                onChange={(event) => handleChange(event, index)}
-                                isInvalid={!!errors.index}
-                            />
-                            <Form.Control.Feedback type="invalid">
-                                {errors.index}
-                            </Form.Control.Feedback>
+                        <Form.Group as={Row} className="mb-3 p-3" controlId="productId" >
+                            <Form.Label column sm={2} className="fs-4" >Product ID:</Form.Label>
+                            <Col sm={10} >
+                                <Form.Control 
+                                    className="pb-0"
+                                    type="number"
+                                    name="productId"
+                                    value={item.productId}
+                                    onChange={(event) => handleChange(event, index)}
+                                    isInvalid={!!errors.index}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.index}
+                                </Form.Control.Feedback>
+                            </Col>
+                        </Form.Group>
+                        <Form.Group as={Row} className="mb-3 p-3" controlId="productName" >
+                            <Form.Label column sm={2} className="fs-4" >Product Name:</Form.Label>
+                            <Col sm={10} >
+                                <Form.Control 
+                                    className="pb-0"
+                                    type="text"
+                                    name="productName"
+                                    value={item.productName}
+                                    onChange={(event) => handleChange(event, index)}
+                                    isInvalid={!!errors.index}
+                                />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.index}
+                                </Form.Control.Feedback>
+                            </Col>
                         </Form.Group>
                         {orderDetails.length > 1 && (
-                            <Button variant="outline-danger" onClick={() => handleDeleteInput(index)} >Delete</Button>
+                            <Button className="w-50 fs-4" variant="outline-danger" onClick={() => handleDeleteInput(index)} >Delete</Button>
                         )}
                         {index === orderDetails.length - 1 && (
-                            <Button variant="outline-success" onClick={() => handleAddInputs()} >Add</Button>
+                            <Button className="w-50 fs-4" variant="outline-success" onClick={() => handleAddInputs()} >Add</Button>
                         )}
                     </div>
                 ))}
 
                 <div className="body" >{JSON.stringify(orderDetails)} </div>
 
-                <Button variant="primary" type="submit" disabled={isSubmitting} >
+                <Button className="w-100 fs-4" variant="outline-info" type="submit" disabled={isSubmitting} >
                     {isSubmitting ? <Spinner as='span' animation="border" size="sm" /> : 'Submit' }
                 </Button>
             </Form>
 
-            <Modal show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title>Success</Modal.Title>
+                    <Modal.Title className="text-success">Success</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Order information has been successfully {order_id ? 'updated' : 'submitted'}!
