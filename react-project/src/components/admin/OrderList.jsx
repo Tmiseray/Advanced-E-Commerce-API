@@ -12,7 +12,7 @@ import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
 function OrderList() {
     const [orders, setOrders] = useState([]);
-    const [details, setDetails] = useState(null);
+    const [details, setDetails] = useState({});
     const [deleteMessage, setDeleteMessage] = useState('');
     const [isFetchingOrders, setIsFetchingOrders] = useState(false);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
@@ -37,6 +37,7 @@ function OrderList() {
         try {
             const response = await axios.get('http://127.0.0.1:5000/orders');
             setOrders(response.data);
+            console.log(orders);
         } catch (error) {
             setError('Error fetching products:', error)
         } finally {
@@ -45,25 +46,28 @@ function OrderList() {
         }
     };
 
-    const fetchDetails = async (id) => {
-        setIsFetchingDetails(true);
-        setError('');
+    // const fetchDetails = async (id) => {
+    //     setIsFetchingDetails(true);
+    //     setError('');
 
-        const timeoutDuration = 5000;
-        const timeoutId = setTimeout(() => {
-            setIsFetchingDetails(false);
-        }, timeoutDuration);
+    //     const timeoutDuration = 5000;
+    //     const timeoutId = setTimeout(() => {
+    //         setIsFetchingDetails(false);
+    //     }, timeoutDuration);
 
-        try {
-            const response = await axios.get(`http://127.0.0.1:5000/orders/${id}`);
-            setDetails(response.data);
-        } catch (error) {
-            setError('Error fetching order details:', error);
-        } finally {
-            clearTimeout(timeoutId);
-            setIsFetchingDetails(false);
-        }
-    };
+    //     try {
+    //         // const orderDetails = orders.id['order_details'];
+    //         // setDetails(orderDetails);
+    //         const response = await axios.get(`http://127.0.0.1:5000/orders/details/${id}`);
+    //         setDetails(prevDetails => ({ ...prevDetails, [id]: response.data.order_details }));
+    //     } catch (error) {
+    //         setError('Error fetching order details:', error);
+    //         console.error(error);
+    //     } finally {
+    //         clearTimeout(timeoutId);
+    //         setIsFetchingDetails(false);
+    //     }
+    // };
 
     const handleClose = () => {
         if (isDeleting) {
@@ -91,13 +95,9 @@ function OrderList() {
         }
     };
 
-    const toggleDetails = (id, variant) => {
-        if (details.id === id) {
-            setDetails(null);
-        } else {
-            fetchDetails(id);
-            setCurrentVariant(variant);
-        }
+    const toggleDetails = (orderId, variant) => {
+        setDetails(prev => ({ ...prev, [orderId]: !prev[orderId] }));
+        setCurrentVariant(variant);
     };
 
     useEffect(() => {
@@ -140,32 +140,35 @@ function OrderList() {
 
     return (
         <Container>
-            <h3>Customers' Orders</h3>
+            <h3 className='fs-1 text-warning'>Customers' Orders</h3>
                 {error && <p className='text-danger'>{error}</p>}
                 {orders.map((order, index) => {
                     const variant = variantList[index % variantList.length];
+                    const [ date, time ] = order.order_date_time.split('T');
                     return (
                         <div key={order.id} >
                             <ListGroup horizontal >
                                 <ListGroup.Item action variant={variant}>ID: {order.id} </ListGroup.Item>
                                 <ListGroup.Item action variant={variant}>Customer ID: {order.customer_id} </ListGroup.Item>
-                                <ListGroup.Item action variant={variant}>Order Placed: {order.order_date_time} </ListGroup.Item>
+                                <ListGroup.Item action variant={variant}>Order Placed: <br /> {date} <br /> {time} </ListGroup.Item>
                                 <ListGroup.Item action variant={variant}>Expected Delivery: {order.expected_delivery_date} </ListGroup.Item>
                                 <ListGroup.Item action variant={variant}>Total Amount: {order.total_amount} </ListGroup.Item>
-                                <ListGroup.Item action variant='light' onClick={() => toggleDetails(order.id, variant)} >Show Details</ListGroup.Item>
+                                <ListGroup.Item action variant='secondary' onClick={() => toggleDetails(order.id, variant)} >
+                                    {details[order.id] ? 'Hide Details' : 'Show Details'}
+                                </ListGroup.Item>
                                 {/* <ListGroup.Item action variant='warning' onClick={() => handleEditOrder(order.id)}>Edit Order</ListGroup.Item>
                                 <ListGroup.Item action variant='danger' onClick={() => handleDelete(order.id)}>Delete Order</ListGroup.Item> */}
                             </ListGroup>
-                            {details.order_id === order.id && details.map(detail => (
-                                <ListGroup horizontal>
-                                    <ListGroup.Item action variant={currentVariant} >Additional Details</ListGroup.Item>
+                            {details[order.id] && order.order_details.map(detail => (
+                                <ListGroup key={detail.product_id} horizontal>
+                                    <ListGroup.Item action variant='transparent' > </ListGroup.Item>
                                     <ListGroup.Item action variant={currentVariant}>Quantity: {detail.quantity} </ListGroup.Item>
                                     <ListGroup.Item action variant={currentVariant}>Product ID: {detail.product_id} </ListGroup.Item>
                                     <ListGroup.Item action variant={currentVariant}>Product Name: {detail.product_name} </ListGroup.Item>
                                     <ListGroup.Item action variant={currentVariant}>Price per Unit: ${detail.price_per_unit} </ListGroup.Item>
                                 </ListGroup>
                             ))}
-                            <ListGroup horizontal >
+                            <ListGroup className='text-center' horizontal >
                                 <ListGroup.Item action variant='warning' onClick={() => handleEditOrder(order.id)}>Edit Order</ListGroup.Item>
                                 <ListGroup.Item action variant='danger' onClick={() => handleDelete(order.id)}>Delete Order</ListGroup.Item>
                             </ListGroup>

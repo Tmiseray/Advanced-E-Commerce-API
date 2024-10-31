@@ -49,7 +49,7 @@ function ProductForm() {
             if (id) {
                 await axios.put(`http://127.0.0.1:5000/products/${id}`, product);
             } else {
-                await axios.post('http://127.0.0.1:5000/products', product);
+                await axios.post('http://127.0.0.1:5000/add-product', product);
             }
             setShowSuccess(true);
         } catch (error) {
@@ -67,16 +67,33 @@ function ProductForm() {
         }));
     };
 
-    const handleClose = () => {
+    const redirectCatalog = () => {
         setShowSuccess(false);
-        setAccount({ name: '', price: '' });
-        setSubmitting(false);
-        if (id) {
-            navigate(`/catalog`);
-        } else {
-            navigate('/products');
-        }
+        navigate(`/catalog`);
     };
+
+    const redirectAddProduct = () => {
+        setShowSuccess(false);
+        setProduct({ name: '', price: '' });
+        navigate('/add-product');
+    };
+
+
+
+    // const handleClose = () => {
+    //     setShowSuccess(false);
+    //     setProduct({ name: '', price: '' });
+    //     setSubmitting(false);
+    //     if (id) {
+    //         navigate(`/catalog`);
+    //     } else {
+    //         navigate('/add-product');
+    //     }
+    // };
+
+
+
+
 
     if (isSubmitting) return 
         <p>
@@ -91,13 +108,14 @@ function ProductForm() {
             <Form onSubmit={handleSubmit} >
                 <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Product Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
-                <Form.Group as={Row} className="mb-2 p-3" controlId="productName" >
+                <Form.Group as={Row} className="mb-2 p-3" controlId="name" >
                     <Form.Label column sm={2} className="fs-4" >Product Name:</Form.Label>
                     <Col sm={10} >
                         <Form.Control 
                             className="pb-0"
+                            size="lg"
                             type="text"
-                            name="productName"
+                            name="name"
                             value={product.name}
                             onChange={handleChange}
                             isInvalid={!!errors.name}
@@ -107,13 +125,14 @@ function ProductForm() {
                         </Form.Control.Feedback>
                     </Col>
                 </Form.Group>
-                <Form.Group as={Row} className="mb-3 p-3" controlId="productPrice" >
+                <Form.Group as={Row} className="mb-3 p-3" controlId="price" >
                     <Form.Label column sm={2} className="fs-4" >Price:</Form.Label>
                     <Col sm={10} >
                         <Form.Control 
                             className="pb-0"
-                            type="number"
-                            name="productPrice"
+                            size="lg"
+                            type="text"
+                            name="price"
                             value={product.price}
                             onChange={handleChange}
                             isInvalid={!!errors.price}
@@ -129,16 +148,19 @@ function ProductForm() {
                 </Button>
             </Form>
 
-            <Modal className="text-center" show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal className="text-center" show={showSuccess} onHide={() => setShowSuccess(false)} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title className="text-success">Success</Modal.Title>
+                    <Modal.Title className="text-success">Success!</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Product information has been successfully {id ? 'updated' : 'added'}!
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="outline-secondary" onClick={handleClose} >
-                        {id ? 'Continue to Catalog' : 'Add Another Product'}
+                    <Button variant="outline-primary" onClick={redirectAddProduct} >
+                        Add A New Product
+                    </Button>
+                    <Button variant="outline-secondary" onClick={redirectCatalog} >
+                        Continue to Catalog
                     </Button>
                 </Modal.Footer>
             </Modal>

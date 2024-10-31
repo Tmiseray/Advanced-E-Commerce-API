@@ -36,13 +36,13 @@ function App() {
   const [name, setName] = useState('');
   const navigate = useNavigate();
 
-  useEffect(() => {
-    sessionStorage.setItem('name', '');
-    sessionStorage.setItem('id', '')
-    sessionStorage.setItem('username', '');
-    sessionStorage.setItem('isLoggedIn', JSON.stringify(false));
-    sessionStorage.setItem('isAdmin', JSON.stringify(false));
-  }, []);
+  // useEffect(() => {
+  //   sessionStorage.setItem('name', '');
+  //   sessionStorage.setItem('id', '')
+  //   sessionStorage.setItem('username', '');
+  //   sessionStorage.setItem('isLoggedIn', JSON.stringify(false));
+  //   sessionStorage.setItem('isAdmin', JSON.stringify(false));
+  // }, []);
 
   const handleLogin = (userData) => {
     setName(userData.name);

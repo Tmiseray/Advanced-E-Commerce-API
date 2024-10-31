@@ -180,7 +180,7 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
                     OOPS... It looks like the information you provided is incorrect or doesn't exist.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={handleReset}>Try Again</Button>
+                    <Button variant="outline-secondary" onClick={handleReset}>Try Again</Button>
                     <Button variant="outline-info" onClick={() => navigate('/register')}>Register</Button>
                 </Modal.Footer>
             </Modal>
