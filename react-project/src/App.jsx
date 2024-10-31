@@ -48,11 +48,11 @@ function App() {
     setName(userData.name);
     setIsLoggedIn(true);
     setIsAdmin(userData.isAdmin);
-    sessionStorage.setItem('name', userData.name);
-    sessionStorage.setItem('id', userData.id);
-    sessionStorage.setItem('username', userData.username);
-    sessionStorage.setItem('isLoggedIn', JSON.stringify(true));
-    sessionStorage.setItem('isAdmin', JSON.stringify(userData.isAdmin));
+    sessionStorage.setItem('name', JSON.stringify(userData.name));
+    sessionStorage.setItem('id', JSON.stringify(userData.id));
+    sessionStorage.setItem('username', JSON.stringify(userData.username));
+    sessionStorage.setItem('isLoggedIn', true);
+    sessionStorage.setItem('isAdmin', userData.isAdmin);
 
     handleSuccessLogin(userData.isAdmin, userData.id);
   }
@@ -113,7 +113,7 @@ function App() {
         <Route path='/customers/:id' element={<CustomerForm  />} />
         <Route path='/customer-profile/:id' element={<CustomerProfile />} />
         <Route path='/orders' element={<OrderList  />} />
-        <Route path='/orders/:id' element={<OrderDetails  />} />
+        <Route path='/orders/details/:id' element={<OrderDetails  />} />
         <Route path='/orders/history-for-customer/:id' element={<OrderHistory  />} />
         <Route path='/orders/track-status/?customer_id=:customer_id&order_id=:order_id' element={<TrackOrder  />} />
         <Route path='/place-order' element={<OrderForm  />} />

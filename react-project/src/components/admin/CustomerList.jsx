@@ -8,9 +8,9 @@
 
 import axios from 'axios';
 import { array, func } from 'prop-types';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
+import { Button, Container, ListGroup, Modal, Spinner, Table } from "react-bootstrap";
 
 function CustomerList() {
     const [customers, setCustomers] = useState([]);
@@ -19,12 +19,10 @@ function CustomerList() {
     const [isFetchingAccount, setIsFetchingAccount] = useState(false);
     const [isDeletingCustomer, setIsDeletingCustomer] = useState(false);
     const [deleteMessage, setDeleteMessage] = useState('');
-    const [currentVariant, setCurrentVariant] = useState('primary');
     const [showRedirect, setShowRedirect] = useState(false);
     const { username } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const variantList = ['primary', 'info'];
 
 
     const fetchCustomers = async () => {
@@ -48,21 +46,19 @@ function CustomerList() {
     };
 
     const fetchCustomerAccount = async (customerId) => {
+
         setIsFetchingAccount(true);
         setError('');
 
-        const timeoutDuration = 5000;
-        const timeoutId = setTimeout(() => {
-            setIsFetchingAccount(false);
-        }, timeoutDuration);
-
         try {
-            const response = await axios.get(`http:127.0.0.1:5000/account/${customerId}`);
+            const response = await axios.get(`http://127.0.0.1:5000/accounts/${customerId}`);
             setCustomerAccount(response.data);
+            console.log(response.data);
         } catch (error) {
-            setError('Error fetching customer account:', error);
+            console.error(error.message);
+            setError('Error fetching customer account:', error.message);
         } finally {
-            clearTimeout(timeoutId);
+            // clearTimeout(timeoutId);
             setIsFetchingAccount(false);
         }
     };
@@ -71,12 +67,11 @@ function CustomerList() {
         setShowRedirect(false);
     };
 
-    const toggleAccount = (id, variant) => {
-        if (customerAccount.customer_id === id) {
-            setCustomerAccount(null);
+    const toggleAccount = (id) => {
+        if (customerAccount && customerAccount.customer_id === id) {
+            setCustomerAccount([]);
         } else {
             fetchCustomerAccount(id);
-            setCurrentVariant(variant);
         }
     };
 
@@ -148,35 +143,74 @@ function CustomerList() {
         <Container>
             <h2 className='text-warning mb-5 h1' >Customers</h2>
                 {error && <p className="text-danger">{error}</p>}
-                {customers.length === 0 ? (
-                    <p>No customers registered.</p>
-                ) : (
-                    customers.map((customer, index) => {
-                        const variant = variantList[index % variantList.length];
-                        return (
-                            <div key={customer.id} >
-                                <ListGroup horizontal >
-                                    <ListGroup.Item action variant={variant}>ID: {customer.id} </ListGroup.Item>
-                                    <ListGroup.Item action variant={variant}>{customer.name} </ListGroup.Item>
-                                    <ListGroup.Item action variant={variant}>Email: {customer.email} </ListGroup.Item>
-                                    <ListGroup.Item action variant={variant}>Phone: {customer.phone} </ListGroup.Item>
-                                    <ListGroup.Item action variant='light' onClick={() => toggleAccount(customer.id, variant)} >Show Account</ListGroup.Item>
-                                    <ListGroup.Item action variant='warning' onClick={() => handleEditContact(customer.id)} >Edit Contact Information</ListGroup.Item>
-                                </ListGroup>
-                                {customerAccount.customer_id === customer.id && (
-                                    <ListGroup horizontal>
-                                        <ListGroup.Item action variant={currentVariant} >Account Details</ListGroup.Item>
-                                        <ListGroup.Item action variant={currentVariant}>Username: {customerAccount.username} </ListGroup.Item>
-                                        <ListGroup.Item action variant={currentVariant}>Password: ${customerAccount.password} </ListGroup.Item>
-                                        <ListGroup.Item action variant='warning' onClick={() => handleEditAccount(customerAccount.customer_id)}>Edit Account Details</ListGroup.Item>
-                                        <ListGroup.Item action variant='danger' onClick={() => handleDeletion(customerAccount.customer_id)}>Delete Customer</ListGroup.Item>
-                                    </ListGroup>
-                                )}
-                            </div>
-                        )
-                    })
-                )}
-
+                <Table striped hover >
+                    <thead>
+                        <tr>
+                            <th className='text-center'>ID</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th className='text-center' colSpan={2}>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {customers.length === 0 ? (
+                            <tr>
+                                <td colSpan={5}>No customers registered.</td>
+                            </tr>
+                        ) : (
+                            customers.map(customer => (
+                                <React.Fragment key={customer.id}>
+                                    <tr>
+                                        <td className='text-center'>{customer.id}</td>
+                                        <td>{customer.name} </td>
+                                        <td>{customer.email} </td>
+                                        <td>{customer.phone} </td>
+                                        <td>
+                                            <Button variant='outline-info' onClick={() => toggleAccount(customer.id)}>
+                                                {customerAccount && customerAccount.customer_id === customer.id ? 'Hide Account' : 'Show Account' }
+                                            </Button>
+                                        </td>
+                                        <td>
+                                            <Button variant='outline-warning' onClick={() => handleEditContact(customer.id)}>
+                                                Edit Contact Info
+                                            </Button>
+                                        </td>
+                                    </tr>
+                                    {customerAccount.customer_id === customer.id && (
+                                        customerAccount.length === 0 ? (
+                                            <tr>
+                                                <td className='text-center' colSpan={6}>This customer has no login details at this time.</td>
+                                            </tr>
+                                        ) : (
+                                            <tr>
+                                                <td className='pt-2'>
+                                                    <strong>Login Info:</strong>
+                                                    <div className='text-primary-emphasis'>Username: </div>
+                                                    <div className='text-danger-emphasis'>Password: </div>
+                                                </td>
+                                                <td className='align-content-end' colSpan={3}>
+                                                    <div>{customerAccount.username}</div>
+                                                    <div>{customerAccount.password}</div>
+                                                </td>
+                                                <td>
+                                                    <Button variant='outline-info' onClick={() => handleEditAccount(customerAccount.customer_id)}>
+                                                        Edit Account Info
+                                                    </Button>
+                                                </td>
+                                                <td>
+                                                    <Button variant='outline-danger' onClick={() => handleDeletion(customerAccount.customer_id)}>
+                                                        Delete Customer
+                                                    </Button>
+                                                </td>
+                                            </tr>
+                                        )
+                                    )}
+                               </React.Fragment>
+                            ))
+                        )}
+                    </tbody>
+            </Table>
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>

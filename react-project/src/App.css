@@ -1,8 +1,27 @@
 /* Text Styles */
 @import url('https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Gayathri:wght@100;400;700&family=Instrument+Serif:ital@0;1&display=swap');
 
-HTML {
+html {
   scroll-behavior: smooth;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+background: lightgoldenrodyellow;
+border-radius: 30px;
+}
+
+::-webkit-scrollbar-thumb {
+background: goldenrod;
+border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+background: rgb(115, 87, 17);
 }
 
 body {
@@ -90,23 +109,17 @@ h2, h3, h4 {
   text-decoration: underline;
 }
 
-.homeButton {
-  /* width: 100%;
-  border: solid 3px purple;
-  border-radius: 10px;
-  background-color: transparent;
-  color: whitesmoke;
-  padding: 10px 28px;
-  font-size: 20px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-left: 10px; */
+td {
+  align-content: center;
 }
 
-.homeButton:hover {
-  /* background-color: rgb(58, 0, 58);
-  color: purple;
-  border-color: whitesmoke; */
-  transition: ease-in .3s;
+strong {
+  color: goldenrod;
 }
+
+
+/* td.align-content-end {
+  overflow-x: scroll;
+  white-space: nowrap;
+}  */
 
