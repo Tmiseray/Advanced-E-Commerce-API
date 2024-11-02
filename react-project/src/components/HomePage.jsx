@@ -10,8 +10,8 @@ function HomePage() {
     const navigate = useNavigate();
 
     return (
-        <>
-            <Container className="d-flex align-items-center justify-content-center bg-body-secondary mt-3" >
+        <div className="p-5" >
+            <Container className="d-flex align-items-center justify-content-center bg-body-secondary" >
                 <header className="text-center p-5" >
                     <h1 className="text-decoration-underline text-warning mb-3" >
                         EMPIRE LUX
@@ -27,7 +27,7 @@ function HomePage() {
                     </Button>
                 </header>
             </Container>
-        </>
+        </div>
     );
 };
 

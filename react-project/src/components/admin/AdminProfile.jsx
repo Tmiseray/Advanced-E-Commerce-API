@@ -1,32 +1,396 @@
 
-import { Container } from "react-bootstrap"
+import { useNavigate } from "react-router-dom";
+import { Accordion, Nav, Card, Button, ProgressBar, Modal, Spinner, Container, Row, Col, NavLink } from "react-bootstrap";
+import axios from "axios";
 import { useEffect, useState } from "react";
+import FullCatalog, { fetchCatalog, fetchDetails } from "./FullCatalog";
+import OrderList, { fetchOrders } from "./OrderList";
+
 
 function AdminProfile() {
-    const [ isLoggedIn, setIsLoggedIn ] = useState(null);
-    const [ isAdmin, setIsAdmin ] = useState(null);
+    const [catalogProducts, setProducts] = useState([]);
+    const [productDetails, setProductDetails] = useState([]);
+    const [customerOrders, setOrders] = useState([]);
+    const [tracking, setTracking] = useState({});
+    const [salesTotal, setSalesTotal] = useState('');
+    const [weeklySales, setWeeklySales] = useState('');
+    const [error, setError] = useState('');
+    const [activeCatalogKey, setActiveCatalogKey] = useState(null);
+    const [activeOrdersKey, setActiveOrdersKey] = useState(null);
+    const [showRedirect, setShowRedirect] = useState(false);
+    const [isDeactivating, setIsDeactivating] = useState(false);
+    const [currentVariant, setCurrentVariant] = useState('outline-primary');
+    const variantList = ['outline-primary', 'outline-info'];
+    const [currentColor, setCurrentColor] = useState('info-subtle');
+    const colorList = ['info-subtle', 'primary-subtle'];
+    const navigate = useNavigate();
+
+
+    const fetchCatalog = async (setProducts, setError) => {
+        setError('');
+    
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/catalog');
+            setProducts(response.data);
+        } catch (error) {
+            setError('Error fetching products:', error)
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
+    
+    const fetchDetails = async (setProductDetails, setError, id) => {
+        setError('');
+    
+        const timeoutDuration = 5000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
+            setProductDetails(response.data);
+        } catch (error) {
+            setError('Error fetching product details:', error);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
+
+
+    const fetchOrders = async (setOrders, setError) => {
+        setError('');
+    
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/orders');
+            setOrders(response.data);
+            console.log(orders);
+        } catch (error) {
+            setError('Error fetching products:', error)
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
+
+    const calcSalesTotal = () => {
+        let total_sales = 0;
+        customerOrders.forEach((order) => {
+            total_sales += order.total_amount;
+        });
+        setSalesTotal(total_sales);
+    };
+
+    const calcWeeklySales = () => {
+        let total_sales = 0;
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+        customerOrders.forEach((order) => {
+            const orderDate = new Date(order.order_date_time.split('T')[0]);
+            if (orderDate >= oneWeekAgo) {
+                total_sales += order.total_amount;
+            }
+        });
+
+        setWeeklySales(total_sales);
+    };
+
+    const toggleDetails = async (productId, variant, color) => {
+        if (productDetails && productDetails.id === productId) {
+            setProductDetails([]);
+            setActiveCatalogKey(null);
+        } else {
+            const details = await fetchDetails(setProductDetails, setError, productId);
+            // setProductDetails(details);
+            setCurrentVariant(variant);
+            setCurrentColor(color);
+            setActiveCatalogKey(productId);
+        }
+    };
+
+    const handleEditProduct = (id) => {
+        setShowRedirect(true);
+        navigate(`/products/${id}`);
+    };
+
+    const handleUpdateStock = (id) => {
+        setShowRedirect(true);
+        navigate(`/catalog/update-stock/${id}`);
+    };
+
+    const handleDeactivation = async (id) => {
+        setIsDeactivating(true);
+        setError('');
+
+        try {
+            const response = await axios.put(`http://127.0.0.1:5000/products/deactivate/${id}`);
+            setDeactivateMessage(response.data);
+        } catch (error) {
+            setError('Error deactivating product:', error);
+        } finally {
+            setIsDeactivating(false);
+        }
+    };
+
+    const handleClose = () => {
+        if (isDeactivating) {
+            setIsDeactivating(false);
+        }
+        setShowRedirect(false);
+    };
+
+    const trackingInformation = async (customerId, orderId) => {
+        setError('');
+
+        try {
+            const response = await axios.post(`/orders/track-status/?customer_id=${customerId}&order_id=${orderId}`);
+            const statusData = response.data;
+
+            setTracking(prev => ({
+                ...prev,
+                [orderId]: {
+                    status: statusData.status,
+                    percent: getProgress(statusData.status),
+                    variant: getVariant(statusData.status),
+                }
+            }));
+        } catch (error) {
+            setError('Error fetching tracking information:', error);
+        }
+    };
+
+    const getProgress = (status) => {
+        switch (status) {
+            case "Order in process": return 25;
+            case "Shipped": return 50;
+            case "Out for delivery": return 75;
+            case "Complete": return 100;
+            default: return 0;
+        }
+    };
+
+    const getVariant = (status) => {
+        switch (status) {
+            case "Order in process": return "warning";
+            case "Shipped": return "success";
+            case "Out for delivery": return "primary";
+            case "Complete": return "info";
+            default: return "secondary";
+        }
+    };
+
+    const toggleProgressStatus = (customerId, orderId) => {
+        if (tracking[orderId]) {
+            setActiveOrdersKey(orderId); // If tracking info exists, show it
+        } else {
+            trackingInformation(customerId, orderId); // Fetch tracking info if not available
+            setActiveOrdersKey(orderId);
+        }
+    };
+
+    const handleOrderDetails = (orderId) => {
+        setShowRedirect(true);
+        navigate(`/orders/details/${orderId}`);
+    }
 
     useEffect(() => {
-        const storedLoginStatus = sessionStorage.getItem('isLoggedIn');
-        const adminStatus = sessionStorage.getItem('isAdmin');
+        // const loadOrders = async () => {
+        //     await fetchOrders(setOrders, setError);
+        // };
 
-        if (storedLoginStatus) {
-            setIsLoggedIn(JSON.parse(storedLoginStatus));
-        } else {
-            setIsLoggedIn(false);
-        }
+        // const loadCatalog = async () => {
+        //     await fetchCatalog(setProducts, setError);
+        // };
 
-        if (adminStatus) {
-            setIsAdmin(JSON.parse(adminStatus));
-        } else {
-            setIsAdmin(false);
-        }
+        fetchOrders();
+        fetchCatalog();
+    })
 
-    }, [isLoggedIn, isAdmin]);
+    useEffect(() => {
+        calcSalesTotal();
+        calcWeeklySales();
+    }, [customerOrders]);
+
+    if (isDeactivating) return
+        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+            <Modal.Header>
+                <Modal.Title>Deactivation</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+                Deactivating Product 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant='outline-secondary' onClick={handleClose} >
+                    Continue
+                </Button>
+            </Modal.Footer>
+        </Modal>;
 
     return (
-        <Container>
-            <p>Work in progress</p>
+        <Container className="bg-body-secondary mt-3" >
+            <header className="text-center p-5">
+                <h1 className="text-decoration-underline text-warning mb-3" >
+                    Administration Manager
+                </h1>
+            </header>
+            <Container fluid >
+                <Row className="g-3" >
+                    <Col xs={2} >
+                        <Container className="bg-warning-subtle h-100" >
+                            <Nav className=''>
+                                <div className="d-grid g-3">
+                                    <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
+                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
+                                        Add Product
+                                    </Button>
+                                    {/* <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                                        Edit Contact Info
+                                    </Button>
+                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                                        Edit Login Info
+                                    </Button>
+                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                                        Contact Us
+                                    </Button> */}
+                                </div>
+                            </Nav>
+                        </Container>
+                    </Col>
+                    <Col colspan={10} >
+                        <Container>
+                            <Row className="ms-1">
+                                {/* <Col > */}
+                                    {/* <Container className="bg-success-subtle text-success-emphasis ms-0 mx-2" > */}
+                                        <Row className="p-3 bg-success-subtle text-success-emphasis">
+                                            <Col>
+                                                <h2>Total Sales</h2>
+                                                <h3 className="text-decoration-none fw-bold fs-2">${salesTotal}</h3>
+                                            </Col>
+                                            
+                                            <Col>
+                                                <h2>Weekly Sales</h2>
+                                                <h3 className="text-decoration-none fw-bold fs-2">${weeklySales}</h3>
+                                            </Col>
+                                        </Row>
+                                    {/* </Container> */}
+                                {/* </Col> */}
+                            </Row>
+                            <Row className="m-1">
+                                <Col colspan={5} className="m-1 p-2 bg-secondary-subtle shadow-lg">
+                                    <h2>Catalog Stock</h2>
+                                    <Row className="fs-5 text-decoration-underline text-info mb-2">
+                                        {/* <h3 className="fs-5 text-decoration-underline text-info mb-2"> */}
+                                            <Col colspan={2}>Product Id</Col>
+                                            <Col colspan={3}>Total Stock</Col>
+                                            <Col colspan={7}>Last Restock Date</Col>
+                                        {/* </h3> */}
+                                    </Row>
+                                    <Container>
+                                        {catalogProducts.map((product, index) => {
+                                            const variant = variantList[index % variantList.length];
+                                            const color = colorList[index % colorList.length];
+                                            return (
+                                                <Accordion activeKey={activeCatalogKey}>
+                                                    <Card key={product.product_id} bg={color} >
+                                                        <Accordion.Header eventKey={product.product_id}>
+                                                            <Row className="w-100" as={Button} variant={variant} onClick={() => toggleDetails(product.product_id, variant, color)} >
+                                                                <Col colspan={2}>{product.product_id}</Col>
+                                                                <Col colspan={3}>{product.product_stock}</Col>
+                                                                <Col colspan={7}>{product.last_restock_date}</Col>
+                                                            </Row>
+                                                        </Accordion.Header>
+                                                        <Accordion.Collapse eventKey={product.product_id} >
+                                                            <Card.Body>
+                                                                <Col as={Button} variant='outline-success' onClick={() => handleUpdateStock(productDetails.id)} colspan={2}>Update Stock</Col>
+                                                                <Col colspan={4}>{productDetails.name}</Col>
+                                                                <Col colspan={2}>${productDetails.price}</Col>
+                                                                <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(productDetails.id)} colspan={2}>Edit Details</Col>
+                                                                <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(productDetails.id)} colspan={2}>Deactivate</Col>
+                                                            </Card.Body>
+                                                        </Accordion.Collapse>
+                                                    </Card>
+                                                </Accordion>
+                                                )
+                                            })}
+                                    </Container>
+                                </Col>
+                                <Col colspan={6} className="m-1 p-2 bg-dark-subtle shadow-lg">
+                                    <h2>Orders</h2>
+                                    <Row className="fs-5 text-decoration-underline text-info mb-2">
+                                        {/* <h3 className="text-decoration-underline text-info mb-2"> */}
+                                            <Col colspan={1}>ID</Col>
+                                            <Col colspan={2}>C. ID</Col>
+                                            <Col colspan={3}>Order Date</Col>
+                                            <Col colspan={3}>Order Time</Col>
+                                            <Col colspan={3}>Total</Col>
+                                        {/* </h3> */}
+                                    </Row>
+                                    <Container>
+                                        {customerOrders.map((order) => {
+                                            const [ date, time ] = order.order_date_time.split('T');
+                                            return (
+                                                <Accordion activeKey={activeOrdersKey} >
+                                                    <Card key={order.id} bg={currentColor} >
+                                                        <Accordion.Header eventKey={order.id}>
+                                                            <Button variant={currentVariant} onClick={() => toggleProgressStatus(order.customer_id, order.id)} >
+                                                                <Col colspan={1}>{order.id}</Col>
+                                                                <Col colspan={1}>{order.customer_id}</Col>
+                                                                <Col colspan={3}>{date}</Col>
+                                                                <Col colspan={3}>{time}</Col>
+                                                                <Col colspan={4}>${order.total_amount} </Col>
+                                                            </Button>
+                                                        </Accordion.Header>
+                                                        <Accordion.Collapse eventKey={order.id} >
+                                                            <Card.Body>
+                                                                <Row className="bg-black text-center text-warning" >
+                                                                    <Col colspan={2}>{tracking[order.id]?.status || 'Loading...'}</Col>
+                                                                    <Col colspan={10}>
+                                                                        <ProgressBar now={tracking[order.id]?.percent || 0} variant={tracking[order.id]?.variant || 'secondary'} animated />
+                                                                    </Col>
+                                                                </Row>
+                                                                
+                                                            </Card.Body>
+                                                            <Card.Footer>
+                                                                <Button variant="outline-light" onClick={() => handleOrderDetails(order.id)}>More Details</Button>
+                                                            </Card.Footer>
+                                                        </Accordion.Collapse>
+                                                    </Card>
+                                                </Accordion>
+                                                )
+                                            })}
+                                    </Container>
+                                </Col>
+                            </Row>
+                        </Container>
+                    </Col>
+                </Row>
+            </Container>
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Redirection</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Redirecting you <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Back to Profile
+                    </Button>
+                    <Button variant='outline-primary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </Container>
     )
 };

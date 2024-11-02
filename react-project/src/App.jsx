@@ -28,6 +28,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { useEffect, useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
+import axios from 'axios';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(() => JSON.parse(sessionStorage.getItem('isLoggedIn')) || false);
@@ -35,14 +36,6 @@ function App() {
   const [showLogoutMessage, setShowLogoutMessage] = useState(false);
   const [name, setName] = useState('');
   const navigate = useNavigate();
-
-  // useEffect(() => {
-  //   sessionStorage.setItem('name', '');
-  //   sessionStorage.setItem('id', '')
-  //   sessionStorage.setItem('username', '');
-  //   sessionStorage.setItem('isLoggedIn', JSON.stringify(false));
-  //   sessionStorage.setItem('isAdmin', JSON.stringify(false));
-  // }, []);
 
   const handleLogin = (userData) => {
     setName(userData.name);
@@ -66,18 +59,16 @@ function App() {
   };
 
   const handleLogout = async () => {
-    const storedName = sessionStorage.getItem('name');
-    if (storedName) {
-        setName(JSON.parse(storedName));
+    try {
+      await axios.post('http://127.0.0.1:5000/logout');
+      setShowLogoutMessage(true);
+    } catch (error) {
+      console.error('Logout error:', error);
     }
-    setShowLogoutMessage(true);
-    
-    await axios.get('http://127.0.0.1:5000/logout');
-
-    sessionStorage.clear();
     setIsLoggedIn(false);
     setIsAdmin(false);
     setName('');
+    sessionStorage.clear();
   };
 
   const handleSuccessLogout = () => {
@@ -93,7 +84,8 @@ function App() {
             <Modal.Title className='text-info' >Goodbye!</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Goodbye, {name}! <br /> You have been logged out.
+            You have been successfully logged out.
+            Please visit again soon!
           </Modal.Body>
           <Modal.Footer>
               <Button variant="outline-primary" onClick={handleSuccessLogout}>OK</Button>

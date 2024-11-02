@@ -10,6 +10,25 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
+
+export const fetchOrders = async (setOrders, setError) => {
+    setError('');
+
+    const timeoutDuration = 10000;
+    const timeoutId = setTimeout(() => {
+    }, timeoutDuration);
+
+    try {
+        const response = await axios.get('http://127.0.0.1:5000/orders');
+        setOrders(response.data);
+        console.log(orders);
+    } catch (error) {
+        setError('Error fetching products:', error)
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
 function OrderList() {
     const [orders, setOrders] = useState([]);
     const [details, setDetails] = useState({});
@@ -23,51 +42,6 @@ function OrderList() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const variantList = ['primary', 'info'];
-
-
-    const fetchOrders = async () => {
-        setIsFetchingOrders(true);
-        setError('');
-
-        const timeoutDuration = 10000;
-        const timeoutId = setTimeout(() => {
-            setIsFetchingOrders(false);
-        }, timeoutDuration);
-
-        try {
-            const response = await axios.get('http://127.0.0.1:5000/orders');
-            setOrders(response.data);
-            console.log(orders);
-        } catch (error) {
-            setError('Error fetching products:', error)
-        } finally {
-            clearTimeout(timeoutId);
-            setIsFetchingOrders(false);
-        }
-    };
-
-    // const fetchDetails = async (id) => {
-    //     setIsFetchingDetails(true);
-    //     setError('');
-
-    //     const timeoutDuration = 5000;
-    //     const timeoutId = setTimeout(() => {
-    //         setIsFetchingDetails(false);
-    //     }, timeoutDuration);
-
-    //     try {
-    //         // const orderDetails = orders.id['order_details'];
-    //         // setDetails(orderDetails);
-    //         const response = await axios.get(`http://127.0.0.1:5000/orders/details/${id}`);
-    //         setDetails(prevDetails => ({ ...prevDetails, [id]: response.data.order_details }));
-    //     } catch (error) {
-    //         setError('Error fetching order details:', error);
-    //         console.error(error);
-    //     } finally {
-    //         clearTimeout(timeoutId);
-    //         setIsFetchingDetails(false);
-    //     }
-    // };
 
     const handleClose = () => {
         if (isDeleting) {
@@ -103,14 +77,6 @@ function OrderList() {
     useEffect(() => {
         fetchOrders();
     }, []);
-
-    if (isFetchingOrders) return 
-        <p>
-            Fetching Orders 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
 
     if (isFetchingDetails) return 
         <p>

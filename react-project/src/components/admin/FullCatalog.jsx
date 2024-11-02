@@ -14,61 +14,53 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
+export const fetchCatalog = async (setProducts, setError) => {
+    setError('');
+
+    const timeoutDuration = 10000;
+    const timeoutId = setTimeout(() => {
+    }, timeoutDuration);
+
+    try {
+        const response = await axios.get('http://127.0.0.1:5000/catalog');
+        setProducts(response.data);
+    } catch (error) {
+        setError('Error fetching products:', error)
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
+export const fetchDetails = async (setDetails, setError, id) => {
+    setError('');
+
+    const timeoutDuration = 5000;
+    const timeoutId = setTimeout(() => {
+    }, timeoutDuration);
+
+    try {
+        const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
+        setDetails(response.data);
+    } catch (error) {
+        setError('Error fetching product details:', error);
+    } finally {
+        clearTimeout(timeoutId);
+    }
+};
+
 function FullCatalog() {
     const [products, setProducts] = useState([]);
-    // const [details, setDetails] = useState([]);
+    const [details, setDetails] = useState([]);
     const [deactivateMessage, setDeactivateMessage] = useState('');
-    const [isFetchingCatalog, setIsFetchingCatalog] = useState(false);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeactivating, setIsDeactivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    const [expandedDetails, setExpandedDetails] = useState([]);
+    // const [expandedDetails, setExpandedDetails] = useState([]);
     const [currentVariant, setCurrentVariant] = useState('primary');
     const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const variantList = ['primary', 'info'];
-
-
-    const fetchCatalog = async () => {
-        setIsFetchingCatalog(true);
-        setError('');
-
-        const timeoutDuration = 10000;
-        const timeoutId = setTimeout(() => {
-            setIsFetchingCatalog(false);
-        }, timeoutDuration);
-
-        try {
-            const response = await axios.get('http://127.0.0.1:5000/catalog');
-            setProducts(response.data);
-        } catch (error) {
-            setError('Error fetching products:', error)
-        } finally {
-            clearTimeout(timeoutId);
-            setIsFetchingCatalog(false);
-        }
-    };
-
-    const fetchDetails = async (id) => {
-        setIsFetchingDetails(true);
-        setError('');
-
-        const timeoutDuration = 5000;
-        const timeoutId = setTimeout(() => {
-            setIsFetchingDetails(false);
-        }, timeoutDuration);
-
-        try {
-            const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
-            setExpandedDetails(response.data);
-        } catch (error) {
-            setError('Error fetching product details:', error);
-        } finally {
-            clearTimeout(timeoutId);
-            setIsFetchingDetails(false);
-        }
-    };
 
     const handleClose = () => {
         if (isDeactivating) {
@@ -102,8 +94,8 @@ function FullCatalog() {
     };
 
     const toggleDetails = (id, variant) => {
-        if (expandedDetails && expandedDetails.id === id) {
-            setExpandedDetails([]);
+        if (details && details.id === id) {
+            setDetails([]);
         } else {
             fetchDetails(id);
             setCurrentVariant(variant);
@@ -113,14 +105,6 @@ function FullCatalog() {
     useEffect(() => {
         fetchCatalog();
     }, []);
-
-    if (isFetchingCatalog) return 
-        <p>
-            Fetching Products in Catalog 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
 
     if (isFetchingDetails) return 
         <p>
@@ -161,15 +145,15 @@ function FullCatalog() {
                                 <ListGroup.Item action variant={variant}>Stock Total: {product.product_stock} </ListGroup.Item>
                                 <ListGroup.Item action variant={variant}>Last Restock Date: <br /> {product.last_restock_date} </ListGroup.Item>
                                 <ListGroup.Item action variant='secondary' onClick={() => toggleDetails(product.product_id, variant)} >
-                                    {expandedDetails && expandedDetails.id === product.product_id ? 'Hide Details' : 'Show Details'}
+                                    {details && details.id === product.product_id ? 'Hide Details' : 'Show Details'}
                                 </ListGroup.Item>
                                 <ListGroup.Item action variant='success' onClick={() => handleUpdateStock(product.product_id)} >Update Stock</ListGroup.Item>
                             </ListGroup>
-                            {expandedDetails.id === product.product_id && (
+                            {details.id === product.product_id && (
                                 <ListGroup horizontal>
                                     <ListGroup.Item action variant='transparent' >  </ListGroup.Item>
-                                    <ListGroup.Item action variant={currentVariant}> {expandedDetails.name} </ListGroup.Item>
-                                    <ListGroup.Item action variant={currentVariant}>Price: ${expandedDetails.price} </ListGroup.Item>
+                                    <ListGroup.Item action variant={currentVariant}> {details.name} </ListGroup.Item>
+                                    <ListGroup.Item action variant={currentVariant}>Price: ${details.price} </ListGroup.Item>
                                     <ListGroup.Item action variant='warning' onClick={() => handleEditProduct(expandedDetails.id)}>Edit Details</ListGroup.Item>
                                     <ListGroup.Item action variant='danger' onClick={() => handleDeactivation(expandedDetails.id)}>Deactivate Product</ListGroup.Item>
                                 </ListGroup>

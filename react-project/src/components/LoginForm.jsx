@@ -34,13 +34,22 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
 
         if (storedName) {
             setName(JSON.parse(storedName));
+        } else {
+            setName('');
         }
+
         if (storedUsername) {
             setUsername(JSON.parse(storedUsername));
+        } else {
+            setUsername('');
         }
+
         if (adminStatus) {
             setIsAdmin(JSON.parse(adminStatus));
+        } else {
+            setIsAdmin(false);
         }
+        
     }, []);
 
     const validateForm = () => {
