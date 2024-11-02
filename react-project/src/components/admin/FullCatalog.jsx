@@ -14,40 +14,6 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
-export const fetchCatalog = async (setProducts, setError) => {
-    setError('');
-
-    const timeoutDuration = 10000;
-    const timeoutId = setTimeout(() => {
-    }, timeoutDuration);
-
-    try {
-        const response = await axios.get('http://127.0.0.1:5000/catalog');
-        setProducts(response.data);
-    } catch (error) {
-        setError('Error fetching products:', error)
-    } finally {
-        clearTimeout(timeoutId);
-    }
-};
-
-export const fetchDetails = async (setDetails, setError, id) => {
-    setError('');
-
-    const timeoutDuration = 5000;
-    const timeoutId = setTimeout(() => {
-    }, timeoutDuration);
-
-    try {
-        const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
-        setDetails(response.data);
-    } catch (error) {
-        setError('Error fetching product details:', error);
-    } finally {
-        clearTimeout(timeoutId);
-    }
-};
-
 function FullCatalog() {
     const [products, setProducts] = useState([]);
     const [details, setDetails] = useState([]);
@@ -55,12 +21,50 @@ function FullCatalog() {
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeactivating, setIsDeactivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    // const [expandedDetails, setExpandedDetails] = useState([]);
-    const [currentVariant, setCurrentVariant] = useState('primary');
+    const [activeCatalogKey, setActiveCatalogKey] = useState(null);
+    const [currentVariant, setCurrentVariant] = useState('outline-primary');
+    const variantList = ['outline-primary', 'outline-info'];
+    const [currentColor, setCurrentColor] = useState('info-subtle');
+    const colorList = ['info-subtle', 'primary-subtle'];
     const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const variantList = ['primary', 'info'];
+
+    const fetchCatalog = async () => {
+        setError('');
+    
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/catalog');
+            setProducts(response.data);
+        } catch (error) {
+            setError('Error fetching products:', error)
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
+    
+    const fetchDetails = async (id) => {
+        setIsFetchingDetails(true);
+        setError('');
+    
+        const timeoutDuration = 5000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
+            setDetails(response.data);
+        } catch (error) {
+            setError('Error fetching product details:', error);
+        } finally {
+            clearTimeout(timeoutId);
+            setIsFetchingDetails(false);
+        }
+    };
 
     const handleClose = () => {
         if (isDeactivating) {
@@ -93,12 +97,15 @@ function FullCatalog() {
         }
     };
 
-    const toggleDetails = (id, variant) => {
+    const toggleDetails = (id, variant, color) => {
         if (details && details.id === id) {
             setDetails([]);
+            setActiveCatalogKey(null);
         } else {
             fetchDetails(id);
             setCurrentVariant(variant);
+            setCurrentColor(color);
+            setActiveCatalogKey(id);
         }
     };
 
@@ -134,7 +141,68 @@ function FullCatalog() {
 
     return (
         <Container>
-            <h3 className='fs-1 text-warning'>Full Catalog</h3>
+            <h2>Catalog Stock</h2>
+                <Row className="fs-5 text-decoration-underline text-info mb-2">
+                    <Col colspan={2}>Product Id</Col>
+                    <Col colspan={3}>Total Stock</Col>
+                    <Col colspan={7}>Last Restock Date</Col>
+                </Row>
+                <Container>
+                    {products.map((product, index) => {
+                        const variant = variantList[index % variantList.length];
+                        const color = colorList[index % colorList.length];
+                        return (
+                            <Accordion activeKey={activeCatalogKey}>
+                                <Card key={product.product_id} bg={color} >
+                                    <Accordion.Header eventKey={product.product_id}>
+                                        <Row className="w-100" as={Button} variant={variant} onClick={() => toggleDetails(product.product_id, variant, color)} >
+                                            <Col colspan={2}>{product.product_id}</Col>
+                                            <Col colspan={3}>{product.product_stock}</Col>
+                                            <Col colspan={7}>{product.last_restock_date}</Col>
+                                        </Row>
+                                    </Accordion.Header>
+                                    <Accordion.Collapse eventKey={product.product_id} >
+                                        <Card.Body>
+                                            <Col as={Button} variant='outline-success' onClick={() => handleUpdateStock(details.id)} colspan={2}>Update Stock</Col>
+                                            <Col colspan={4}>{details.name}</Col>
+                                            <Col colspan={2}>${details.price}</Col>
+                                            <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(details.id)} colspan={2}>Edit Details</Col>
+                                            <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details.id)} colspan={2}>Deactivate</Col>
+                                        </Card.Body>
+                                    </Accordion.Collapse>
+                                </Card>
+                            </Accordion>
+                            )
+                        })}
+                </Container>
+
+            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Redirection</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Redirecting you to update Product ID: {products.id} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Back to Catalog
+                    </Button>
+                    <Button variant='outline-primary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        </Container>
+    );
+};
+
+export default FullCatalog;
+
+
+
+/*
+
+<h3 className='fs-1 text-warning'>Full Catalog</h3>
                 {error && <p className='text-danger'>{error}</p>}
                 {products.map((product, index) => {
                     const variant = variantList[index % variantList.length];
@@ -163,24 +231,4 @@ function FullCatalog() {
                     )}
                 )}
 
-            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
-                <Modal.Header>
-                    <Modal.Title>Redirection</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Redirecting you to update Product ID: {products.id} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant='outline-secondary' onClick={handleClose} >
-                        Back to Catalog
-                    </Button>
-                    <Button variant='outline-primary' onClick={handleClose} >
-                        Continue
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </Container>
-    );
-};
-
-export default FullCatalog;
+*/
