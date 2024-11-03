@@ -39,8 +39,8 @@ img:hover {
   border: solid 2px gold;
 }
 
-.navbar {
-
+div.row {
+  font-family: 'Gayathri';
 }
 
 .navLink {
@@ -123,9 +123,11 @@ strong {
   color: goldenrod;
 }
 
+.stock-badge {
+  transition: transform 0.2s;
+}
 
-/* td.align-content-end {
-  overflow-x: scroll;
-  white-space: nowrap;
-}  */
+.stock-badge:hover {
+  transform: scale(1.2);
+}
 

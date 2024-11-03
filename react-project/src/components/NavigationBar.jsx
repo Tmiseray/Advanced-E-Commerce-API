@@ -4,7 +4,6 @@
 import { func } from 'prop-types';
 import { NavLink, useParams } from "react-router-dom";
 import { Navbar, Nav, Image, Container } from "react-bootstrap";
-import { useEffect, useState } from "react";
 
 function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
 

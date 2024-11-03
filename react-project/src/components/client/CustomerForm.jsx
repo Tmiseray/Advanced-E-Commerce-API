@@ -7,7 +7,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { object, func } from 'prop-types';
 import { Form, Button, Alert, Modal, Spinner, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
@@ -57,9 +56,6 @@ function CustomerForm() {
                 setNewId(customerId);
             }
             setShowSuccess(true);
-            // Possibly add code here to redirect
-            // if (id) => LoginForm
-            // else => AccountForm
         } catch (error) {
             if (error.response) {
                 setErrorMessage(error.response.data);
@@ -163,7 +159,7 @@ function CustomerForm() {
 
             <Modal className="text-center" show={showSuccess} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
-                    <Modal.Title className="text-success" >Success</Modal.Title>
+                    <Modal.Title className="text-success" >Success!</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     Contact information has been successfully {id ? 'updated' : 'added'}!

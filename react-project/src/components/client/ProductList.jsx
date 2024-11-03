@@ -4,7 +4,6 @@
 */
 
 import axios from 'axios';
-import { array, func } from 'prop-types';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";

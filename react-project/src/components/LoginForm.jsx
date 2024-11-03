@@ -6,8 +6,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { object, func } from 'prop-types';
-import { Container, Form, Button, Alert, Modal, Spinner, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Modal, Spinner, Row, Col } from "react-bootstrap";
 import {Icon} from 'react-icons-kit';
 import {eye, eyeOff} from 'react-icons-kit/feather';
 import axios from "axios";
@@ -96,15 +95,6 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
             setIsResetting(false);
         }, 500);
     };
-
-    // const handleSuccessLogin = () => {
-    //     setShowSuccess(true);
-    //     if (isAdmin) {
-    //         navigate('/admin-profile')
-    //     } else {
-    //         navigate(`/customer-profile/${id}`)
-    //     }
-    // };
     
     const togglePassword = () => {
         setPasswordVisible(!passwordVisible);
@@ -122,7 +112,6 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
         <Container>
             <Form onSubmit={handleSubmit} noValidate >
                 <h3 className="fs-1 text-warning" >Login</h3>
-                {/* {errors && <Alert variant="danger" >{errors} </Alert>} */}
                 <Form.Group as={Row} className="mb-2 p-3" controlId="username" >
                     <Form.Label column sm={2} className="fs-4" >Username:</Form.Label>
                     <Col sm={10} >

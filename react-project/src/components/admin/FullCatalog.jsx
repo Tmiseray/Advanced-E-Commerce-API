@@ -9,23 +9,20 @@
 */
 
 import axios from 'axios';
-import { array, func } from 'prop-types';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
+import { Button, Container, Modal, Spinner, Row, Col, Accordion, Card } from "react-bootstrap";
 
 function FullCatalog() {
     const [products, setProducts] = useState([]);
-    const [details, setDetails] = useState([]);
+    const [details, setDetails] = useState({});
     const [deactivateMessage, setDeactivateMessage] = useState('');
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeactivating, setIsDeactivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
     const [activeCatalogKey, setActiveCatalogKey] = useState(null);
-    const [currentVariant, setCurrentVariant] = useState('outline-primary');
-    const variantList = ['outline-primary', 'outline-info'];
-    const [currentColor, setCurrentColor] = useState('info-subtle');
-    const colorList = ['info-subtle', 'primary-subtle'];
+    const [currentColor, setCurrentColor] = useState('text-info');
+    const colorList = ['text-info', 'text-primary-emphasis'];
     const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
@@ -57,7 +54,19 @@ function FullCatalog() {
     
         try {
             const response = await axios.get(`http://127.0.0.1:5000/products/${id}`);
-            setDetails(response.data);
+            const detailsData = response.data;
+            console.log(detailsData);
+
+            setDetails(prev => ({
+                ...prev, 
+                [detailsData.id]: {
+                    id: detailsData.id,
+                    name: detailsData.name,
+                    price: detailsData.price,
+                    active: (detailsData.is_active ? 'Active' : 'Inactive'),
+                }
+            }))
+            console.log(details)
         } catch (error) {
             setError('Error fetching product details:', error);
         } finally {
@@ -97,13 +106,11 @@ function FullCatalog() {
         }
     };
 
-    const toggleDetails = (id, variant, color) => {
-        if (details && details.id === id) {
-            setDetails([]);
+    const toggleDetails = (id, color) => {
+        if (details[id]) {
             setActiveCatalogKey(null);
         } else {
             fetchDetails(id);
-            setCurrentVariant(variant);
             setCurrentColor(color);
             setActiveCatalogKey(id);
         }
@@ -112,6 +119,10 @@ function FullCatalog() {
     useEffect(() => {
         fetchCatalog();
     }, []);
+
+    useEffect(() => {
+        console.log('Details State updated:', details);
+    }, [details]);
 
     if (isFetchingDetails) return 
         <p>
@@ -142,39 +153,45 @@ function FullCatalog() {
     return (
         <Container>
             <h2>Catalog Stock</h2>
-                <Row className="fs-5 text-decoration-underline text-info mb-2">
-                    <Col colspan={2}>Product Id</Col>
-                    <Col colspan={3}>Total Stock</Col>
-                    <Col colspan={7}>Last Restock Date</Col>
+                <Row className="fs-5 text-center text-decoration-underline ps-3 pe-5  text-secondary-emphasis mb-2">
+                    <Col colSpan={3}>Stock</Col>
+                    <Col colSpan={4}>Product Id</Col>
+                    <Col colSpan={5}>Restock</Col>
                 </Row>
-                <Container>
+                <Accordion className='border border-primary rounded' defaultActiveKey={'0'}>
                     {products.map((product, index) => {
-                        const variant = variantList[index % variantList.length];
                         const color = colorList[index % colorList.length];
                         return (
-                            <Accordion activeKey={activeCatalogKey}>
-                                <Card key={product.product_id} bg={color} >
-                                    <Accordion.Header eventKey={product.product_id}>
-                                        <Row className="w-100" as={Button} variant={variant} onClick={() => toggleDetails(product.product_id, variant, color)} >
-                                            <Col colspan={2}>{product.product_id}</Col>
-                                            <Col colspan={3}>{product.product_stock}</Col>
-                                            <Col colspan={7}>{product.last_restock_date}</Col>
+                            <Accordion.Item key={product.product_id} eventKey={product.product_id}>
+                                <Accordion.Header onClick={() => toggleDetails(product.product_id, color)}>
+                                    <Row className={`w-100 fs-5 text-center ${color}`}>
+                                        <Col colSpan={3}>{product.product_stock}</Col>
+                                        <Col colSpan={4}>{product.product_id}</Col>
+                                        <Col colSpan={5}>{product.last_restock_date}</Col>
+                                    </Row>
+                                </Accordion.Header>
+                                <Accordion.Body className="bg-body-tertiary text-center text-warning-emphasis fs-5" eventKey={product.product_id.toString()} >
+                                    <Card.Body className='pb-2'>
+                                        {details[product.product_id] && (
+                                        <Row className='pb-3 fs-5 pt-2' >
+                                            <Col colSpan={3}>{details[product.product_id].active}</Col>
+                                            <Col colSpan={4}>${details[product.product_id].price}</Col>
+                                            <Col colSpan={5}>{details[product.product_id].name}</Col>                                        
                                         </Row>
-                                    </Accordion.Header>
-                                    <Accordion.Collapse eventKey={product.product_id} >
-                                        <Card.Body>
-                                            <Col as={Button} variant='outline-success' onClick={() => handleUpdateStock(details.id)} colspan={2}>Update Stock</Col>
-                                            <Col colspan={4}>{details.name}</Col>
-                                            <Col colspan={2}>${details.price}</Col>
-                                            <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(details.id)} colspan={2}>Edit Details</Col>
-                                            <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details.id)} colspan={2}>Deactivate</Col>
-                                        </Card.Body>
-                                    </Accordion.Collapse>
-                                </Card>
-                            </Accordion>
+                                        )}
+                                        <Card.Footer>
+                                            <Row className='w-100'>
+                                                <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(details[product.product_id].id)} >Edit Details</Col>
+                                                <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details[product.product_id].id)} >Deactivate</Col>
+                                                <Col as={Button} variant='outline-light' onClick={() => handleUpdateStock(details[product.product_id].id)} >Update Stock</Col>
+                                            </Row>
+                                        </Card.Footer>
+                                    </Card.Body>
+                                </Accordion.Body>
+                            </Accordion.Item>
                             )
                         })}
-                </Container>
+                </Accordion>
 
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
@@ -198,37 +215,3 @@ function FullCatalog() {
 
 export default FullCatalog;
 
-
-
-/*
-
-<h3 className='fs-1 text-warning'>Full Catalog</h3>
-                {error && <p className='text-danger'>{error}</p>}
-                {products.map((product, index) => {
-                    const variant = variantList[index % variantList.length];
-                    return (
-                        <div key={product.product_id} >
-                            <ListGroup horizontal >
-                                <ListGroup.Item action variant={variant}>ID: {product.product_id} </ListGroup.Item>
-                                <ListGroup.Item action variant={variant}>Stock Total: {product.product_stock} </ListGroup.Item>
-                                <ListGroup.Item action variant={variant}>Last Restock Date: <br /> {product.last_restock_date} </ListGroup.Item>
-                                <ListGroup.Item action variant='secondary' onClick={() => toggleDetails(product.product_id, variant)} >
-                                    {details && details.id === product.product_id ? 'Hide Details' : 'Show Details'}
-                                </ListGroup.Item>
-                                <ListGroup.Item action variant='success' onClick={() => handleUpdateStock(product.product_id)} >Update Stock</ListGroup.Item>
-                            </ListGroup>
-                            {details.id === product.product_id && (
-                                <ListGroup horizontal>
-                                    <ListGroup.Item action variant='transparent' >  </ListGroup.Item>
-                                    <ListGroup.Item action variant={currentVariant}> {details.name} </ListGroup.Item>
-                                    <ListGroup.Item action variant={currentVariant}>Price: ${details.price} </ListGroup.Item>
-                                    <ListGroup.Item action variant='warning' onClick={() => handleEditProduct(expandedDetails.id)}>Edit Details</ListGroup.Item>
-                                    <ListGroup.Item action variant='danger' onClick={() => handleDeactivation(expandedDetails.id)}>Deactivate Product</ListGroup.Item>
-                                </ListGroup>
-                            )}
-
-                        </div>
-                    )}
-                )}
-
-*/

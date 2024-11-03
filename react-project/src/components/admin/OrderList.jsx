@@ -5,46 +5,42 @@
 */
 
 import axios from 'axios';
-import { array, func } from 'prop-types';
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
+import { Button, Container, Modal, Spinner, Row, Col, Accordion, Card, ProgressBar } from "react-bootstrap";
 
-
-export const fetchOrders = async (setOrders, setError) => {
-    setError('');
-
-    const timeoutDuration = 10000;
-    const timeoutId = setTimeout(() => {
-    }, timeoutDuration);
-
-    try {
-        const response = await axios.get('http://127.0.0.1:5000/orders');
-        setOrders(response.data);
-        console.log(orders);
-    } catch (error) {
-        setError('Error fetching products:', error)
-    } finally {
-        clearTimeout(timeoutId);
-    }
-};
 
 function OrderList() {
     const [orders, setOrders] = useState([]);
-    const [details, setDetails] = useState({});
+    const [tracking, setTracking] = useState({});
+    const [activeOrdersKey, setActiveOrdersKey] = useState(null);
     const [deleteMessage, setDeleteMessage] = useState('');
-    const [isFetchingOrders, setIsFetchingOrders] = useState(false);
-    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    const [currentVariant, setCurrentVariant] = useState('outline-primary');
-    const variantList = ['outline-primary', 'outline-info'];
-    const [currentColor, setCurrentColor] = useState('info-subtle');
-    const colorList = ['info-subtle', 'primary-subtle'];
+    const [currentColor, setCurrentColor] = useState('text-info');
+    const colorList = ['text-info', 'text-primary-emphasis'];
     const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+
+    const fetchOrders = async () => {
+        setError('');
+    
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/orders');
+            setOrders(response.data);
+            console.log(orders);
+        } catch (error) {
+            setError('Error fetching products:', error)
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
 
     const handleClose = () => {
         if (isDeleting) {
@@ -52,6 +48,11 @@ function OrderList() {
         }
         setShowRedirect(false);
     };
+
+    const handleDetails = (orderId) => {
+        setShowRedirect(true);
+        navigate(`/orders/details/${orderId}`);
+    }
 
     const handleEditOrder = (id) => {
         setShowRedirect(true);
@@ -72,17 +73,13 @@ function OrderList() {
         }
     };
 
-    // const toggleDetails = (orderId, variant) => {
-    //     setDetails(prev => ({ ...prev, [orderId]: !prev[orderId] }));
-    //     setCurrentVariant(variant);
-    // };
-
     const trackingInformation = async (customerId, orderId) => {
         setError('');
 
         try {
-            const response = await axios.post(`/orders/track-status/?customer_id=${customerId}&order_id=${orderId}`);
+            const response = await axios.get(`http://127.0.0.1:5000/orders/track-status/?customer_id=${customerId}&order_id=${orderId}`);
             const statusData = response.data;
+            console.log(response.data);
 
             setTracking(prev => ({
                 ...prev,
@@ -117,27 +114,24 @@ function OrderList() {
         }
     };
 
-    const toggleProgressStatus = (customerId, orderId) => {
+    const toggleProgressStatus = (customerId, orderId, color) => {
+        console.log('Toggling Status for:', orderId);
         if (tracking[orderId]) {
-            setActiveOrdersKey(orderId); // If tracking info exists, show it
+            setActiveOrdersKey(null);
         } else {
-            trackingInformation(customerId, orderId); // Fetch tracking info if not available
+            trackingInformation(customerId, orderId);
+            setCurrentColor(color);
             setActiveOrdersKey(orderId);
         }
     };
-
 
     useEffect(() => {
         fetchOrders();
     }, []);
 
-    if (isFetchingDetails) return 
-        <p>
-            Fetching Order Details 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    useEffect(() => {
+        console.log("Tracking State updated", tracking);
+    }, [tracking]);
 
     if (isDeleting) return
         <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
@@ -160,47 +154,49 @@ function OrderList() {
     return (
         <Container>
             <h2>Orders</h2>
-                <Row className="fs-5 text-decoration-underline text-info mb-2">
-                        <Col colspan={1}>ID</Col>
-                        <Col colspan={2}>C. ID</Col>
-                        <Col colspan={3}>Order Date</Col>
-                        <Col colspan={3}>Order Time</Col>
-                        <Col colspan={3}>Total</Col>
+                <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
+                    <Col colSpan={1}>Order ID</Col>
+                    <Col colSpan={1}>Cust. ID</Col>
+                    <Col colSpan={7}>Date/Time</Col>
+                    <Col colSpan={3}>Total</Col>
                 </Row>
-                <Container>
-                    {customerOrders.map((order) => {
+                <Accordion className='border border-primary rounded' defaultActiveKey={'0'}>
+                    {orders.map((order, index) => {
                         const [ date, time ] = order.order_date_time.split('T');
+                        const color = colorList[index % colorList.length];
                         return (
-                            <Accordion activeKey={activeOrdersKey} >
-                                <Card key={order.id} bg={currentColor} >
-                                    <Accordion.Header eventKey={order.id}>
-                                        <Button variant={currentVariant} onClick={() => toggleProgressStatus(order.customer_id, order.id)} >
-                                            <Col colspan={1}>{order.id}</Col>
-                                            <Col colspan={1}>{order.customer_id}</Col>
-                                            <Col colspan={3}>{date}</Col>
-                                            <Col colspan={3}>{time}</Col>
-                                            <Col colspan={4}>${order.total_amount} </Col>
-                                        </Button>
-                                    </Accordion.Header>
-                                    <Accordion.Collapse eventKey={order.id} >
-                                        <Card.Body>
-                                            <Row className="bg-black text-center text-warning" >
-                                                <Col colspan={2}>{tracking[order.id]?.status || 'Loading...'}</Col>
-                                                <Col colspan={10}>
-                                                    <ProgressBar now={tracking[order.id]?.percent || 0} variant={tracking[order.id]?.variant || 'secondary'} animated />
-                                                </Col>
-                                            </Row>
-                                            
-                                        </Card.Body>
+                            <Accordion.Item eventKey={order.id} key={order.id} >
+                                <Accordion.Header onClick={() => toggleProgressStatus(order.customer_id, order.id, color)}>
+                                    <Row className={`w-100 fs-5 text-center ${color}`} >
+                                        <Col colSpan={1}>{order.id}</Col>
+                                        <Col colSpan={1}>{order.customer_id}</Col>
+                                        <Col className='text-nowrap' colSpan={7}>
+                                                {date} <br /> {time}
+                                        </Col>
+                                        <Col colSpan={3}>${order.total_amount} </Col>
+                                    </Row>
+                                </Accordion.Header>
+                                <Accordion.Body className="bg-body-tertiary text-center text-warning-emphasis" eventKey={order.id.toString()}>
+                                    <Card.Body className='pb-2'>
+                                        <Row className='pb-3 fs-5 pt-2'>
+                                            <Col colSpan={1}>{tracking[order.id]?.status || 'Loading...'}</Col>
+                                            <Col colSpan={11}>
+                                                <ProgressBar className='w-100' now={tracking[order.id]?.percent || 0} variant={tracking[order.id]?.variant || 'secondary'} animated />
+                                            </Col>
+                                        </Row>
                                         <Card.Footer>
-                                            <Button variant="outline-light" onClick={() => handleOrderDetails(order.id)}>More Details</Button>
+                                            <Row className='w-100'>
+                                                <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
+                                                <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
+                                                <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
+                                            </Row>
                                         </Card.Footer>
-                                    </Accordion.Collapse>
-                                </Card>
-                            </Accordion>
+                                    </Card.Body>
+                                </Accordion.Body>
+                            </Accordion.Item>
                             )
                         })}
-                </Container>
+                </Accordion>
 
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
@@ -224,41 +220,3 @@ function OrderList() {
 
 export default OrderList;
 
-
-
-
-// <h3 className='fs-1 text-warning'>Customers' Orders</h3>
-//                 {error && <p className='text-danger'>{error}</p>}
-//                 {orders.map((order, index) => {
-//                     const variant = variantList[index % variantList.length];
-//                     const [ date, time ] = order.order_date_time.split('T');
-//                     return (
-//                         <div key={order.id} >
-//                             <ListGroup horizontal >
-//                                 <ListGroup.Item action variant={variant}>ID: {order.id} </ListGroup.Item>
-//                                 <ListGroup.Item action variant={variant}>Customer ID: {order.customer_id} </ListGroup.Item>
-//                                 <ListGroup.Item action variant={variant}>Order Placed: <br /> {date} <br /> {time} </ListGroup.Item>
-//                                 <ListGroup.Item action variant={variant}>Expected Delivery: {order.expected_delivery_date} </ListGroup.Item>
-//                                 <ListGroup.Item action variant={variant}>Total Amount: {order.total_amount} </ListGroup.Item>
-//                                 <ListGroup.Item action variant='secondary' onClick={() => toggleDetails(order.id, variant)} >
-//                                     {details[order.id] ? 'Hide Details' : 'Show Details'}
-//                                 </ListGroup.Item>
-//                                 {/* <ListGroup.Item action variant='warning' onClick={() => handleEditOrder(order.id)}>Edit Order</ListGroup.Item>
-//                                 <ListGroup.Item action variant='danger' onClick={() => handleDelete(order.id)}>Delete Order</ListGroup.Item> */}
-//                             </ListGroup>
-//                             {details[order.id] && order.order_details.map(detail => (
-//                                 <ListGroup key={detail.product_id} horizontal>
-//                                     <ListGroup.Item action variant='transparent' > </ListGroup.Item>
-//                                     <ListGroup.Item action variant={currentVariant}>Quantity: {detail.quantity} </ListGroup.Item>
-//                                     <ListGroup.Item action variant={currentVariant}>Product ID: {detail.product_id} </ListGroup.Item>
-//                                     <ListGroup.Item action variant={currentVariant}>Product Name: {detail.product_name} </ListGroup.Item>
-//                                     <ListGroup.Item action variant={currentVariant}>Price per Unit: ${detail.price_per_unit} </ListGroup.Item>
-//                                 </ListGroup>
-//                             ))}
-//                             <ListGroup className='text-center' horizontal >
-//                                 <ListGroup.Item action variant='warning' onClick={() => handleEditOrder(order.id)}>Edit Order</ListGroup.Item>
-//                                 <ListGroup.Item action variant='danger' onClick={() => handleDelete(order.id)}>Delete Order</ListGroup.Item>
-//                             </ListGroup>
-//                         </div>
-//                     )}
-//                 )}

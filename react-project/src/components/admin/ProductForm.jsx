@@ -7,7 +7,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { object, func } from 'prop-types';
 import { Container, Form, Button, Alert, Modal, Spinner, Row, Col } from "react-bootstrap";
 import axios from "axios";
 

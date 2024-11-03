@@ -1,7 +1,6 @@
 import { Route, Routes, useNavigate } from 'react-router-dom';
 // Admin Components
 import AdminProfile from './components/admin/AdminProfile';
-import CustomerAccounts from './components/admin/CustomerAccounts';
 import CustomerList from './components/admin/CustomerList';
 import FullCatalog from './components/admin/FullCatalog';
 import StockMonitor from './components/admin/StockMonitor';
