@@ -199,11 +199,15 @@ function OrderHistory() {
                                                     </Col>
                                                 </Row>
                                                 <Card.Footer>
-                                                    <Row className='w-100'>
-                                                        <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
-                                                        <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
-                                                        <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
-                                                    </Row>
+                                                <Row className='w-100'>
+                                                    {tracking[order.id].status === 'Order in process' (
+                                                        <>
+                                                            <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
+                                                            <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
+                                                        </>
+                                                    )}
+                                                    <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
+                                                </Row>
                                                 </Card.Footer>
                                             </Card.Body>
                                         </Accordion.Body>
@@ -245,8 +249,12 @@ function OrderHistory() {
                                         </Row>
                                         <Card.Footer>
                                             <Row className='w-100'>
-                                                <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
-                                                <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
+                                                {tracking[order.id].status === 'Order in process' (
+                                                    <>
+                                                        <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
+                                                        <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
+                                                    </>
+                                                )}
                                                 <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
                                             </Row>
                                         </Card.Footer>

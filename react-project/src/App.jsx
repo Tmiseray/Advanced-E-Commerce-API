@@ -6,7 +6,6 @@ import FullCatalog from './components/admin/FullCatalog';
 import StockMonitor from './components/admin/StockMonitor';
 import OrderList from './components/admin/OrderList';
 import ProductForm from './components/admin/ProductForm';
-import UpdateStockForm from './components/admin/UpdateStockForm';
 // Client Components
 import AccountForm from './components/client/AccountForm';
 import CustomerForm from './components/client/CustomerForm';
@@ -21,7 +20,6 @@ import LoginForm from './components/LoginForm';
 import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound';
 import OrderDetails from './components/OrderDetails';
-import TrackOrder from './components/TrackOrder';
 // Styles
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -99,7 +97,6 @@ function App() {
         <Route path='/accounts/:id' element={<AccountForm  />} />
         <Route path='/catalog' element={<FullCatalog  />} />
         <Route path='/stock-monitor' element={<StockMonitor  />} />
-        <Route path='/update-stock/:id' element={<UpdateStockForm  />} />
         <Route path='/customers' element={<CustomerList  />} />
         <Route path='/register' element={<CustomerForm  />} />
         <Route path='/customers/:id' element={<CustomerForm  />} />
@@ -107,7 +104,6 @@ function App() {
         {/* <Route path='/orders' element={<OrderList  />} /> */}
         <Route path='/orders/details/:id' element={<OrderDetails  />} />
         <Route path='/orders/history-for-customer/:id' element={<OrderHistory  />} />
-        <Route path='/orders/track-status/?customer_id=:customer_id&order_id=:order_id' element={<TrackOrder  />} />
         <Route path='/place-order' element={<OrderForm  />} />
         <Route path='/orders/:id' element={<OrderForm  />} />
         <Route path='/add-product' element={<ProductForm  />} />
