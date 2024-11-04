@@ -4,9 +4,9 @@ import { Accordion, Nav, Card, Button, ProgressBar, Modal, Spinner, Container, R
 import axios from "axios";
 import { useEffect, useState } from "react";
 import FullCatalog from "./FullCatalog";
-// import OrderList from "./OrderList";
+import OrderList from "./OrderList";
 import StockMonitor from "./StockMonitor";
-import OrderHistory from "../OrderHistory";
+// import OrderHistory from "../OrderHistory";
 
 
 function AdminProfile() {
@@ -153,8 +153,8 @@ function AdminProfile() {
                                     <FullCatalog />
                                 </Col>
                                 <Col colSpan={7} className="mt-1 ms-3 me-0 p-2 bg-dark-subtle shadow-lg border border-3 border-secondary">
-                                    {/* <OrderList /> */}
-                                    <OrderHistory />
+                                    <OrderList />
+                                    {/* <OrderHistory /> */}
                                 </Col>
                             </Row>
                     </Col>

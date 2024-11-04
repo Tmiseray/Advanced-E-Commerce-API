@@ -10,10 +10,10 @@ import ProductForm from './components/admin/ProductForm';
 import AccountForm from './components/client/AccountForm';
 import CustomerForm from './components/client/CustomerForm';
 import CustomerProfile from './components/client/CustomerProfile';
-import OrderForm from './components/OrderForm';
-import OrderHistory from './components/OrderHistory';
 import ProductList from './components/client/ProductList';
 // App Components
+import OrderForm from './components/OrderForm';
+import OrderHistory from './components/OrderHistory';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
@@ -101,7 +101,7 @@ function App() {
         <Route path='/register' element={<CustomerForm  />} />
         <Route path='/customers/:id' element={<CustomerForm  />} />
         <Route path='/customer-profile/:id' element={<CustomerProfile />} />
-        {/* <Route path='/orders' element={<OrderList  />} /> */}
+        <Route path='/orders' element={<OrderList  />} />
         <Route path='/orders/details/:id' element={<OrderDetails  />} />
         <Route path='/orders/history-for-customer/:id' element={<OrderHistory  />} />
         <Route path='/place-order' element={<OrderForm  />} />

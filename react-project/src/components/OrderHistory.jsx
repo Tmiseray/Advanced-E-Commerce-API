@@ -22,9 +22,9 @@ function OrderHistory() {
     const colorList = ['text-info', 'text-primary-emphasis'];
     const [error, setError] = useState('');
     const navigate = useNavigate();
-    const id = sessionStorage.getItem('id');
-
-    const fetchOrders = async (id) => {
+    
+    const fetchOrders = async () => {
+        const id = sessionStorage.getItem('id');
         setError('');
     
         const timeoutDuration = 10000;
@@ -138,7 +138,7 @@ function OrderHistory() {
     };
 
     useEffect(() => {
-        fetchOrders(id);
+        fetchOrders();
     }, []);
 
     useEffect(() => {
