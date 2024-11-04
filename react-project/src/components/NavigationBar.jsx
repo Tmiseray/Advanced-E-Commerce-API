@@ -34,11 +34,6 @@ function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
                                 Products
                             </Nav.Link>
                         }
-                        {isAdmin 
-                            && <Nav.Link as={NavLink} to='/stock-monitor' className="navLink" activeclassname='active' >
-                                Stock Monitor
-                            </Nav.Link>
-                        }
                         {isLoggedIn
                             ? (isAdmin 
                                 ? <Nav.Link as={NavLink} to='/orders' className="navLink" activeclassname='active' >
@@ -60,7 +55,7 @@ function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
                             : <Nav.Link as={NavLink} to='/register' className="navLink" activeclassname='active' >
                                 Account Creation
                             </Nav.Link>
-                        }  {/* Maybe adjust to /account-creation instead of customers */}
+                        }
                         {isLoggedIn 
                             ? <Nav.Link onClick={handleLogout}  className="navLink" activeclassname='active' >
                                 Logout

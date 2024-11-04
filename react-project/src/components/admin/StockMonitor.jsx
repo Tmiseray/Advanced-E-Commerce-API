@@ -5,149 +5,96 @@
 
 */
 
-import { useEffect, useRef, useState } from "react";
-import { Container, Badge, Overlay, Popover, Button, Spinner, ListGroup, Modal, Alert } from "react-bootstrap";
+import { useEffect, useState } from "react";
+import { Container, Badge, Button, Spinner, ListGroup, Modal } from "react-bootstrap";
 import axios from "axios";
 
 function StockMonitor({products}) {
-    const [productsBelowThreshold, setProductsBelowThreshold] = useState({});
+    const [productsBelowThreshold, setProductsBelowThreshold] = useState([]);
     const [numProductsToStock, setNumProductsToStock] = useState(0);
     const [productDetails, setProductDetails] = useState({});
     const [modalMessage, setModalMessage] = useState([]);
     const [showMessage, setShowMessage] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [isRestocking, setIsRestocking] = useState(false);
-    const [showOverlay, setShowOverlay] = useState(false);
     const [error, setError] = useState('');
-    const targetRef = useRef(null);
     const threshold = 10;
 
-
-    useEffect(() => {
-        const fetchProductDetails = async () => {
-            const belowThreshold = products.filter(product => product.product_stock <= threshold);
-            console.log('Products below threshold:', belowThreshold)
-            
+    const fetchProductDetails = async () => {
+        const belowThreshold = products.filter(product => product.product_stock <= threshold);
+        console.log('Products below threshold:', belowThreshold)
         
-        // Fetch product details for those below the threshold
-            belowThreshold.map(async product => {
-                try {
-                    const response = await axios.get(`http://127.0.0.1:5000/products/${product.product_id}`);
-                    const detailsData = response.data;
-                    console.log(detailsData);
-                    const productStock = product.product_stock;
-
-                    setProductDetails(prev => ({
-                        ...prev,
-                        [detailsData.id.toString()]: {
-                            id: detailsData.id,
-                            name: detailsData.name,
-                            stock: productStock,
-                        }
-                    }))
-                    
-                } catch (error) {
-                    console.error('Error fetching product details:', error);
-                    setError(error);
-                }
-            });
-
-
-            // const details = await Promise.all(detailsPromises);
-            // const filteredBelowThreshold = productsBelowThreshold.filter(product => product)
-            console.log(productDetails);
-            setProductsBelowThreshold(productDetails); // Filter out any null responses
-            console.log(productsBelowThreshold)
-            setNumProductsToStock(belowThreshold.length);
-        };
-        fetchProductDetails();
-    }, [products]);
-
-    const handleRestock = async (event) => {
-        event.preventDefault();
+        const details = {};
+        
+        await Promise.all(belowThreshold.map(async product => {
+            try {
+                const response = await axios.get(`http://127.0.0.1:5000/products/${product.product_id}`);
+                const detailsData = response.data;
+                // console.log(detailsData);
+                const productStock = product.product_stock;
+                
+                details[detailsData.id.toString()] = {
+                    id: detailsData.id,
+                    name: detailsData.name,
+                    stock: productStock,
+                };
+            } catch (error) {
+                console.error('Error fetching product details:', error);
+                setError(error);
+            }
+        }));
+        
+        setProductsBelowThreshold(Object.values(details));
+        console.log(productsBelowThreshold)
+        setNumProductsToStock(belowThreshold.length);
+    };
+    
+    const handleRestock = async () => {
         setShowAlert(false);
         setIsRestocking(true);
+        setModalMessage([]);
+        const messages = [];
+        
         try {
-            // Logic to update stock in the database
-            // Loop through productsBelowThreshold to perform updates
             console.log("Restocking products:", productsBelowThreshold);
-            // Example API call to update stock for each product
-            // await axios.put('http://127.0.0.1:5000/restock', { products: productsBelowThreshold });
-            productsBelowThreshold.map(async product => {
-                try {
-                    const response = await axios.post(`http://127.0.0.1:5000/catalog/update-stock/${product.id}`);
-                    const messageData = response.data;
-                    console.log(messageData);
-                    console.log(messageData['message']);
+            const response = await axios.post(`http://127.0.0.1:5000/stock-monitor`);
+            const messageData = response.data;
+            console.log(messageData);
+            
+            // messages.push(messageData['message']);
+            if (messageData['Products Below Threshold'].length === 0) {
+                messages.push("No products below threshold to restock.");
+            } else {
+                messages.push(messageData['message']);
+            }
+            
 
-                    setModalMessage(prev => ([
-                        ...prev, 
-                        messageData['message'],
-                    ]))
-                } catch (error) {
-                    setError(error);
-                }
-            })
+            setModalMessage(messages);
             setShowMessage(true);
         } catch (error) {
-            setError('Error restocking products:', error);
+            console.error('Error restocking products:', error.response ? error.response.data : error.message);
+            setError('Error restocking products');
         } finally {
             setIsRestocking(false);
         }
     };
-
-    const handleReload = () => {
+    
+    const handleReload = async () => {
         setShowMessage(false);
-        window.location.reload();
+        try {
+            await fetchProductDetails();
+        } catch (error) {
+            console.error('Error fetching product details:', error);
+            setError(error);
+        }
     };
 
-    const handleAlert = () => {
-        setShowAlert(true);
-        return (
-            <Alert show={showAlert} variant="warning" >
-                <Alert.Heading as={'h3'}>
-                    Products Below Threshold
-                </Alert.Heading>
-
-                    <ListGroup>
-                        {productsBelowThreshold.length > 0 ? (
-                            productsBelowThreshold.map(product => (
-                                <ListGroup.Item key={product.product_id}>
-                                    {product.name.toString()} - Current Stock: {product.stock.toString()}
-                                </ListGroup.Item>
-                                ))
-                        ) : (
-                            <div>No products below threshold.</div>
-                        )}
-                    </ListGroup>
-                    <hr />
-
-                    <Button onClick={() => handleRestock()} disabled={numProductsToStock === 0} >Restock All</Button>
-
-            </Alert>
-        )
-    };
-
-    // const popover = 
-    //         <Popover id="popover-basic">
-    //             <Popover.Header as="h3">Products Below Threshold</Popover.Header>
-    //             <Popover.Body>
-    //                 {productsBelowThreshold.length > 0? (
-    //                     productsBelowThreshold.map(product => (
-    //                         <div key={product.product_id}>{product.name}</div>
-    //                         ))
-    //                 ) : (
-    //                     <div>No products below threshold.</div>
-    //                 )}
-    //             </Popover.Body>
-    //             <Popover.Footer>
-    //                 <Button onClick={() => handleRestock()} disabled={numProductsToStock === 0} >Restock All</Button>
-    //             </Popover.Footer>
-    //         </Popover>
-
-
+    useEffect(() => {
+        fetchProductDetails();
+    }, [products]);
+    
     if (isRestocking) return
-        <p>
+    <p>
             Restocking  
             <Spinner animation="grow" size="sm" /> 
             <Spinner animation="grow" size="sm" /> 
@@ -158,8 +105,35 @@ function StockMonitor({products}) {
         <Container className="pt-4">
             <h3 className="pb-2" >Stock Monitor</h3>
             <div>
-                <Badge as={Button} onClick={() => handleAlert()} pill bg="warning" text="dark" className="stock-badge fw-bold fs-6">{numProductsToStock} Products Low</Badge>
+                <Badge as={Button} onClick={() => setShowAlert(true)} pill bg="warning" text="dark" className="stock-badge fw-bold fs-6">{numProductsToStock} Products Low</Badge>
             </div>
+
+            <Modal className='text-center' show={showAlert} onHide={() => setShowAlert(false)} backdrop='static' keyboard={false} >
+                <Modal.Header className="bg-warning-subtle">
+                    <Modal.Title className='text-warning-emphasis fw-bold' >Low Stock Levels!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className="text-warning-emphasis bg-warning-subtle">
+                    Products currently below the stock threshold:
+                    <ListGroup>
+                        {productsBelowThreshold.length > 0 ? (
+                            productsBelowThreshold.map(product => (
+                                <ListGroup.Item key={product.id}>
+                                    {product.name} - Current Stock: {product.stock}
+                                </ListGroup.Item>
+                                ))
+                        ) : (
+                            <div>No products below threshold.</div>
+                        )}
+                    </ListGroup>
+                </Modal.Body>
+                <Modal.Footer className="bg-warning-subtle">
+                    {productsBelowThreshold.length > 0 ? (
+                        <Button variant="outline-primary" onClick={handleRestock} >Restock All</Button>
+                    ) : (
+                        <Button variant="outline-secondary" onClick={() => setShowAlert(false)} >Close</Button>
+                    )}
+                </Modal.Footer>
+            </Modal>
             
             <Modal className='text-center' show={showMessage} onHide={() => setShowMessage(false)} backdrop='static' keyboard={false}>
                 <Modal.Header>

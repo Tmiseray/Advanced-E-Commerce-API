@@ -10,7 +10,7 @@
 
 import axios from 'axios';
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button, Container, Modal, Spinner, Row, Col, Accordion, Card } from "react-bootstrap";
 
 function FullCatalog() {
@@ -23,7 +23,6 @@ function FullCatalog() {
     const [activeCatalogKey, setActiveCatalogKey] = useState(null);
     const [currentColor, setCurrentColor] = useState('text-info');
     const colorList = ['text-info', 'text-primary-emphasis'];
-    const { id } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -85,11 +84,6 @@ function FullCatalog() {
     const handleEditProduct = (id) => {
         setShowRedirect(true);
         navigate(`/products/${id}`);
-    };
-
-    const handleUpdateStock = (id) => {
-        setShowRedirect(true);
-        navigate(`/catalog/update-stock/${id}`);
     };
 
     const handleDeactivation = async (id) => {
@@ -183,7 +177,6 @@ function FullCatalog() {
                                             <Row className='w-100'>
                                                 <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(details[product.product_id].id)} >Edit Details</Col>
                                                 <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details[product.product_id].id)} >Deactivate</Col>
-                                                <Col as={Button} variant='outline-light' onClick={() => handleUpdateStock(details[product.product_id].id)} >Update Stock</Col>
                                             </Row>
                                         </Card.Footer>
                                     </Card.Body>
