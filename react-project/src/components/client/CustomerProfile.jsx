@@ -1,4 +1,5 @@
 
+import OrderHistory from "../OrderHistory";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Accordion, Nav, Card, Button, ProgressBar, Modal, Spinner, Container, Row, Col, NavLink, useAccordionButton } from "react-bootstrap";
@@ -26,96 +27,96 @@ function CustomerProfile() {
         setName(storedName);
     };
 
-    const orderHistory = async (id) => {
-        setError('');
+    // const orderHistory = async (id) => {
+    //     setError('');
 
-        try {
-            const response = await axios.post(`http://127.0.0.1:5000/orders/history-for-customer/${id}`);
-            setOrders(response.data);
-            console.log(orders);
-        } catch (error) {
-            setError('Error fetching order history:', error);
-        }
-    };
+    //     try {
+    //         const response = await axios.post(`http://127.0.0.1:5000/orders/history-for-customer/${id}`);
+    //         setOrders(response.data);
+    //         console.log(orders);
+    //     } catch (error) {
+    //         setError('Error fetching order history:', error);
+    //     }
+    // };
 
-    const trackingInformation = async (id, orderId) => {
-        setError('');
+    // const trackingInformation = async (id, orderId) => {
+    //     setError('');
 
-        try {
-            const response = await axios.post(`/orders/track-status/?customer_id=${id}&order_id=${orderId}`);
-            const statusData = response.data;
+    //     try {
+    //         const response = await axios.post(`/orders/track-status/?customer_id=${id}&order_id=${orderId}`);
+    //         const statusData = response.data;
 
-            setTracking(prev => ({
-                ...prev,
-                [orderId]: {
-                    status: statusData.status,
-                    percent: getProgress(statusData.status),
-                    variant: getVariant(statusData.status),
-                }
-            }));
-        } catch (error) {
-            setError('Error fetching tracking information:', error);
-        }
-    };
+    //         setTracking(prev => ({
+    //             ...prev,
+    //             [orderId]: {
+    //                 status: statusData.status,
+    //                 percent: getProgress(statusData.status),
+    //                 variant: getVariant(statusData.status),
+    //             }
+    //         }));
+    //     } catch (error) {
+    //         setError('Error fetching tracking information:', error);
+    //     }
+    // };
 
-    const getProgress = (status) => {
-        switch (status) {
-            case "Order in process": return 25;
-            case "Shipped": return 50;
-            case "Out for delivery": return 75;
-            case "Complete": return 100;
-            default: return 0;
-        }
-    };
+    // const getProgress = (status) => {
+    //     switch (status) {
+    //         case "Order in process": return 25;
+    //         case "Shipped": return 50;
+    //         case "Out for delivery": return 75;
+    //         case "Complete": return 100;
+    //         default: return 0;
+    //     }
+    // };
 
-    const getVariant = (status) => {
-        switch (status) {
-            case "Order in process": return "warning";
-            case "Shipped": return "success";
-            case "Out for delivery": return "primary";
-            case "Complete": return "info";
-            default: return "secondary";
-        }
-    };
+    // const getVariant = (status) => {
+    //     switch (status) {
+    //         case "Order in process": return "warning";
+    //         case "Shipped": return "success";
+    //         case "Out for delivery": return "primary";
+    //         case "Complete": return "info";
+    //         default: return "secondary";
+    //     }
+    // };
 
-    const toggleOrderDetails = (orderId, variant, color, eventKey) => {
-        useAccordionButton(eventKey);
-        setDetails(prev => ({...prev, [orderId]: !prev[orderId] }));
-        setCurrentVariant(variant);
-        setCurrentColor(color);
-    };
+    // const toggleOrderDetails = (orderId, variant, color, eventKey) => {
+    //     useAccordionButton(eventKey);
+    //     setDetails(prev => ({...prev, [orderId]: !prev[orderId] }));
+    //     setCurrentVariant(variant);
+    //     setCurrentColor(color);
+    // };
 
-    const toggleProgressStatus = (eventKey) => {
-        useAccordionButton(eventKey);
-    };
+    // const toggleProgressStatus = (eventKey) => {
+    //     useAccordionButton(eventKey);
+    // };
 
-    const handleClose = () => {
-        if (showDelete) {
-            setShowDelete(false);
-        }
-        setShowRedirect(false);
-    };
+    // const handleClose = () => {
+    //     if (showDelete) {
+    //         setShowDelete(false);
+    //     }
+    //     setShowRedirect(false);
+    // };
 
-    const handleEditOrder = (orderId) => {
-        setShowRedirect(true);
-        navigate(`/orders/${orderId}`);
-    };
+    // const handleEditOrder = (orderId) => {
+    //     setShowRedirect(true);
+    //     navigate(`/orders/${orderId}`);
+    // };
 
-    const handleDelete = async (orderId) => {
-        setShowDelete(true);
-        setError('');
+    // const handleDelete = async (orderId) => {
+    //     setShowDelete(true);
+    //     setError('');
 
-        try {
-            const response = await axios.delete(`http://127.0.0.1:5000/orders/${orderId}`);
+    //     try {
+    //         const response = await axios.delete(`http://127.0.0.1:5000/orders/${orderId}`);
             
-        } catch (error) {
-            setError('Error deleting order:', error);
-        }
-    };
+    //     } catch (error) {
+    //         setError('Error deleting order:', error);
+    //     }
+    // };
 
     useEffect(() => {
         getStorageItems();
-        orderHistory(id);
+        // orderHistory(id);
     }, [id]);
 
     if (showDelete) return
@@ -153,7 +154,7 @@ function CustomerProfile() {
             </header>
             <Container fluid>
                 <Row className="g-3" >
-                    <Col xs={2}>
+                    <Col colSpan={2}>
                         <Container className="bg-warning-subtle" >
                             <Nav className='flex-column'>
                                 <div className="d-grid gap-3">
@@ -174,8 +175,9 @@ function CustomerProfile() {
                             </Nav>
                         </Container>
                     </Col>
-                    <Col xs={5} >
-                        <Container className="bg-secondary-subtle">
+                    <Col colSpan={10} >
+                        <OrderHistory />
+                        {/* <Container className="bg-secondary-subtle">
                             <div className="d-grid gap-2" >
                                 <h3 className="text-decoration-underline text-warning mb-3">Order History</h3>
                                 {error && <p className="text-danger">{error}</p> }
@@ -227,9 +229,9 @@ function CustomerProfile() {
                                     }) }
                                 </Accordion>
                             </div>
-                        </Container>
+                        </Container> */}
                     </Col>
-                    <Col xs={5} >
+                    {/* <Col xs={5} >
                         <Container className="bg-info-subtle">
                             <div className="d-grid gap-2" >
                                 <h3 className="text-decoration-underline text-warning mb-3">Order Progress</h3>
@@ -267,10 +269,10 @@ function CustomerProfile() {
                                 </Accordion>
                             </div>
                         </Container>
-                    </Col>
+                    </Col> */}
                 </Row>
             </Container>
-            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+            {/* <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>
@@ -285,7 +287,7 @@ function CustomerProfile() {
                         Continue
                     </Button>
                 </Modal.Footer>
-            </Modal>
+            </Modal> */}
         </Container>
     );
 };

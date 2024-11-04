@@ -1,6 +1,8 @@
 /*
 
+    - Manage Order History (Bonus): Create a component that allows customers to access their order history, listing all previous orders placed. Each order entry should provide comprehensive information, including the order date and associated products.
     - Cancel Order (Bonus): Implement an order cancellation feature, allowing customers to cancel an order if it hasn't been shipped or completed. Ensure that canceled orders are appropriately reflected in the system.
+    - Calculate Order Total Price (Bonus): Include a component that calculates the total price of items in a specific order, considering the prices of the products included in the order. This calculation should be specific to each customer and each order, providing accurate pricing information.
 
 */
 
@@ -9,8 +11,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Container, Modal, Spinner, Row, Col, Accordion, Card, ProgressBar } from "react-bootstrap";
 
-
-function OrderList() {
+function OrderHistory() {
     const [orders, setOrders] = useState([]);
     const [tracking, setTracking] = useState({});
     const [activeOrdersKey, setActiveOrdersKey] = useState(null);
@@ -21,23 +22,35 @@ function OrderList() {
     const colorList = ['text-info', 'text-primary-emphasis'];
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const id = sessionStorage.getItem('id');
 
-
-    const fetchOrders = async () => {
+    const fetchOrders = async (id) => {
         setError('');
     
         const timeoutDuration = 10000;
         const timeoutId = setTimeout(() => {
         }, timeoutDuration);
-    
-        try {
-            const response = await axios.get('http://127.0.0.1:5000/orders');
-            setOrders(response.data);
-            console.log(orders);
-        } catch (error) {
-            setError('Error fetching orders:', error)
-        } finally {
-            clearTimeout(timeoutId);
+        
+        if (id === 6) {
+            try {
+                const response = await axios.get('http://127.0.0.1:5000/orders');
+                setOrders(response.data);
+                console.log(orders);
+            } catch (error) {
+                setError('Error fetching products:', error)
+            } finally {
+                clearTimeout(timeoutId);
+            }
+        } else {
+            try {
+                const response = await axios.post(`http://127.0.0.1:5000/orders/history-for-customer/${id}`);
+                setOrders(response.data);
+                console.log(orders);
+            } catch (error) {
+                setError('Error fetching orders:', error);
+            } finally {
+                clearTimeout(timeoutId);
+            }
         }
     };
 
@@ -125,7 +138,7 @@ function OrderList() {
     };
 
     useEffect(() => {
-        fetchOrders();
+        fetchOrders(id);
     }, []);
 
     useEffect(() => {
@@ -152,10 +165,58 @@ function OrderList() {
 
     return (
         <Container>
-            <h2>Orders</h2>
+            {id === 6 ? (
+                <>
+                    <h2>Orders</h2>
+                        <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
+                            <Col colSpan={1}>Order ID</Col>
+                            <Col colSpan={1}>Cust. ID</Col>
+                            <Col colSpan={7}>Date/Time</Col>
+                            <Col colSpan={3}>Total</Col>
+                        </Row>
+                        <Accordion className='border border-primary rounded' defaultActiveKey={'0'}>
+                            {orders.map((order, index) => {
+                                const [ date, time ] = order.order_date_time.split('T');
+                                const color = colorList[index % colorList.length];
+                                return (
+                                    <Accordion.Item eventKey={order.id} key={order.id} >
+                                        <Accordion.Header onClick={() => toggleProgressStatus(order.customer_id, order.id, color)}>
+                                            <Row className={`w-100 fs-5 text-center ${color}`} >
+                                                <Col colSpan={1}>{order.id}</Col>
+                                                <Col colSpan={1}>{order.customer_id}</Col>
+                                                <Col className='text-nowrap' colSpan={7}>
+                                                        {date} <br /> {time}
+                                                </Col>
+                                                <Col colSpan={3}>${order.total_amount} </Col>
+                                            </Row>
+                                        </Accordion.Header>
+                                        <Accordion.Body className="bg-body-tertiary text-center text-warning-emphasis" eventKey={order.id.toString()}>
+                                            <Card.Body className='pb-2'>
+                                                <Row className='pb-3 fs-5 pt-2'>
+                                                    <Col colSpan={1}>{tracking[order.id]?.status || 'Loading...'}</Col>
+                                                    <Col colSpan={11}>
+                                                        <ProgressBar className='w-100' now={tracking[order.id]?.percent || 0} variant={tracking[order.id]?.variant || 'secondary'} animated />
+                                                    </Col>
+                                                </Row>
+                                                <Card.Footer>
+                                                    <Row className='w-100'>
+                                                        <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
+                                                        <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
+                                                        <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
+                                                    </Row>
+                                                </Card.Footer>
+                                            </Card.Body>
+                                        </Accordion.Body>
+                                    </Accordion.Item>
+                                    )
+                                })}
+                        </Accordion>
+                </>
+            ) : (
+                <>
+                    <h2>Order History</h2>
                 <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
-                    <Col colSpan={1}>Order ID</Col>
-                    <Col colSpan={1}>Cust. ID</Col>
+                    <Col colSpan={2}>Order ID</Col>
                     <Col colSpan={7}>Date/Time</Col>
                     <Col colSpan={3}>Total</Col>
                 </Row>
@@ -167,8 +228,7 @@ function OrderList() {
                             <Accordion.Item eventKey={order.id} key={order.id} >
                                 <Accordion.Header onClick={() => toggleProgressStatus(order.customer_id, order.id, color)}>
                                     <Row className={`w-100 fs-5 text-center ${color}`} >
-                                        <Col colSpan={1}>{order.id}</Col>
-                                        <Col colSpan={1}>{order.customer_id}</Col>
+                                        <Col colSpan={2}>{order.id}</Col>
                                         <Col className='text-nowrap' colSpan={7}>
                                                 {date} <br /> {time}
                                         </Col>
@@ -195,7 +255,9 @@ function OrderList() {
                             </Accordion.Item>
                             )
                         })}
-                </Accordion>
+                    </Accordion>
+                </>
+            )}
 
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
@@ -217,5 +279,4 @@ function OrderList() {
     );
 };
 
-export default OrderList;
-
+export default OrderHistory;

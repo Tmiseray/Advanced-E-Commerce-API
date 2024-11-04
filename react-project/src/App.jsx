@@ -11,8 +11,8 @@ import UpdateStockForm from './components/admin/UpdateStockForm';
 import AccountForm from './components/client/AccountForm';
 import CustomerForm from './components/client/CustomerForm';
 import CustomerProfile from './components/client/CustomerProfile';
-import OrderForm from './components/client/OrderForm';
-import OrderHistory from './components/client/OrderHistory';
+import OrderForm from './components/OrderForm';
+import OrderHistory from './components/OrderHistory';
 import ProductList from './components/client/ProductList';
 // App Components
 import Footer from './components/Footer';
@@ -104,7 +104,7 @@ function App() {
         <Route path='/register' element={<CustomerForm  />} />
         <Route path='/customers/:id' element={<CustomerForm  />} />
         <Route path='/customer-profile/:id' element={<CustomerProfile />} />
-        <Route path='/orders' element={<OrderList  />} />
+        {/* <Route path='/orders' element={<OrderList  />} /> */}
         <Route path='/orders/details/:id' element={<OrderDetails  />} />
         <Route path='/orders/history-for-customer/:id' element={<OrderHistory  />} />
         <Route path='/orders/track-status/?customer_id=:customer_id&order_id=:order_id' element={<TrackOrder  />} />
