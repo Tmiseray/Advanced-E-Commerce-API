@@ -37,7 +37,7 @@ function OrderHistory() {
                 setOrders(response.data);
                 console.log(orders);
             } catch (error) {
-                setError('Error fetching products:', error)
+                setError('Error fetching products:', error.message);
             } finally {
                 clearTimeout(timeoutId);
             }
@@ -47,7 +47,7 @@ function OrderHistory() {
                 setOrders(response.data);
                 console.log(orders);
             } catch (error) {
-                setError('Error fetching orders:', error);
+                setError('Error fetching orders:', error.message);
             } finally {
                 clearTimeout(timeoutId);
             }
@@ -145,23 +145,26 @@ function OrderHistory() {
         console.log("Tracking State updated", tracking);
     }, [tracking]);
 
-    if (isDeleting) return
-        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
-            <Modal.Header>
-                <Modal.Title>Deletion</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Deleting Order
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant='outline-secondary' onClick={handleClose} >
-                    Continue
-                </Button>
-            </Modal.Footer>
-        </Modal>;
+    if (isDeleting) {
+        return(
+            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Deleting Order
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    };
 
     return (
         <Container>

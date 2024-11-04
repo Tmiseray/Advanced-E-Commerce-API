@@ -118,31 +118,37 @@ function FullCatalog() {
         console.log('Details State updated:', details);
     }, [details]);
 
-    if (isFetchingDetails) return 
-        <p>
-            Fetching Product Details 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isFetchingDetails) {
+        return (
+            <p>
+                Fetching Product Details 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
-    if (isDeactivating) return
-        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
-            <Modal.Header>
-                <Modal.Title>Deactivation</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Deactivating Product 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant='outline-secondary' onClick={handleClose} >
-                    Continue
-                </Button>
-            </Modal.Footer>
-        </Modal>;
+    if (isDeactivating) {
+        return (
+            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Deactivation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Deactivating Product 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    };
 
     return (
         <Container>

@@ -100,13 +100,16 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
         setPasswordVisible(!passwordVisible);
     };
 
-    if (isSubmitting) return 
-        <p>
-            Verifying Information 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isSubmitting) {
+        return (
+            <p>
+                Verifying information 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
     return (
         <Container>

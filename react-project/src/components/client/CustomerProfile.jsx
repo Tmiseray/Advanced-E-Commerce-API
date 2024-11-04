@@ -119,23 +119,26 @@ function CustomerProfile() {
         // orderHistory(id);
     }, [id]);
 
-    if (showDelete) return
-        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
-            <Modal.Header>
-                <Modal.Title>Deletion</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Deleting Order
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant='outline-secondary' onClick={handleClose} >
-                    Continue
-                </Button>
-            </Modal.Footer>
-        </Modal>;
+    if (showDelete) {
+        return (
+            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Deleting Order
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    };
 
     return (
         <Container className="d-flex align-items-center justify-content-center bg-body-secondary mt-3" >

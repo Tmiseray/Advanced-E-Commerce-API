@@ -47,13 +47,16 @@ function OrderDetails() {
         fetchDetails(id);
     }, [id]);
 
-    if (isLoading) return
-        <p>
-            Fetching Order Details 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isLoading) {
+        return (
+            <p>
+                Fetching Order Details 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
     return (
         <Container>

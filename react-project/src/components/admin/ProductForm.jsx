@@ -77,8 +77,6 @@ function ProductForm() {
         navigate('/add-product');
     };
 
-
-
     // const handleClose = () => {
     //     setShowSuccess(false);
     //     setProduct({ name: '', price: '' });
@@ -90,17 +88,16 @@ function ProductForm() {
     //     }
     // };
 
-
-
-
-
-    if (isSubmitting) return 
+    if (isSubmitting) {
+        return  (
         <p>
             Submitting information 
             <Spinner animation="grow" size="sm" /> 
             <Spinner animation="grow" size="sm" /> 
             <Spinner animation="grow" size="sm" /> 
-        </p>;
+        </p>
+        )
+    };
 
     return (
         <Container>

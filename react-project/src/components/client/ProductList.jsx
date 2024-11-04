@@ -51,13 +51,16 @@ function ProductList() {
         fetchProducts();
     }, []);
 
-    if (isFetching) return 
-        <p>
-            Fetching Products 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isFetching) {
+        return (
+            <p>
+                Fetching Products 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
     return (
         <Container>

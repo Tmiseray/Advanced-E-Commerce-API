@@ -99,13 +99,16 @@ function AccountForm() {
         }
     };
 
-    if (isSubmitting) return 
-        <p>
-            Submitting information 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isSubmitting) {
+        return (
+            <p>
+                Submitting information 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
     return (
         <Container>

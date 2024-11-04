@@ -93,13 +93,16 @@ function StockMonitor({products}) {
         fetchProductDetails();
     }, [products]);
     
-    if (isRestocking) return
-    <p>
-            Restocking  
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isRestocking) {
+        return (
+            <p>
+                Restocking  
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
     return (
         <Container className="pt-4">

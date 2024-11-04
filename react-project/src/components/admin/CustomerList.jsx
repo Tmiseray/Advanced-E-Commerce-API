@@ -104,39 +104,48 @@ function CustomerList() {
         fetchCustomers();
     }, []);
 
-    if (isFetchingCustomers) return 
-        <p>
-            Fetching Customers 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-            <Spinner animation="grow" size="sm" /> 
-        </p>;
+    if (isFetchingCustomers) {
+        return  (
+            <p>
+                Fetching Customers 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
-    if (isFetchingAccount) return 
-    <p>
-        Fetching Account Details 
-        <Spinner animation="grow" size="sm" /> 
-        <Spinner animation="grow" size="sm" /> 
-        <Spinner animation="grow" size="sm" /> 
-    </p>;
+    if (isFetchingAccount) {
+        return (
+            <p>
+                Fetching Account Details 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+                <Spinner animation="grow" size="sm" /> 
+            </p>
+        )
+    };
 
-    if (isDeletingCustomer) return
-        <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
-            <Modal.Header>
-                <Modal.Title>Deletion</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                Deleting Customer Data 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant='outline-secondary' onClick={handleClose} >
-                    Continue
-                </Button>
-            </Modal.Footer>
-        </Modal>;
+    if (isDeletingCustomer) {
+        return (
+            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Deletion</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Deleting Customer Data 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    };
 
 
     return (
