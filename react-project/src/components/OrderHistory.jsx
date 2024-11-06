@@ -14,6 +14,7 @@ import { Button, Container, Modal, Spinner, Row, Col, Accordion, Card, ProgressB
 function OrderHistory() {
     const [orders, setOrders] = useState([]);
     const [tracking, setTracking] = useState({});
+    const [ id, setId ] = useState('');
     const [activeOrdersKey, setActiveOrdersKey] = useState(null);
     const [deleteMessage, setDeleteMessage] = useState('');
     const [isDeleting, setIsDeleting] = useState(false);
@@ -24,33 +25,25 @@ function OrderHistory() {
     const navigate = useNavigate();
     
     const fetchOrders = async () => {
-        const id = sessionStorage.getItem('id');
-        setError('');
+        const storedId = sessionStorage.getItem('id');
+        if (storedId) {
+            setId(JSON.parse(storedId));
+        };
+        const id = JSON.parse(storedId);
+
     
         const timeoutDuration = 10000;
         const timeoutId = setTimeout(() => {
         }, timeoutDuration);
         
-        if (id === 6) {
-            try {
-                const response = await axios.get('http://127.0.0.1:5000/orders');
-                setOrders(response.data);
-                console.log(orders);
-            } catch (error) {
-                setError('Error fetching products:', error.message);
-            } finally {
-                clearTimeout(timeoutId);
-            }
-        } else {
-            try {
-                const response = await axios.post(`http://127.0.0.1:5000/orders/history-for-customer/${id}`);
-                setOrders(response.data);
-                console.log(orders);
-            } catch (error) {
-                setError('Error fetching orders:', error.message);
-            } finally {
-                clearTimeout(timeoutId);
-            }
+        try {
+            const response = await axios.post(`http://127.0.0.1:5000/orders/history-for-customer/${id}`);
+            setOrders(response.data);
+            console.log(orders);
+        } catch (error) {
+            setError('Error fetching orders:', error.message);
+        } finally {
+            clearTimeout(timeoutId);
         }
     };
 
@@ -137,6 +130,8 @@ function OrderHistory() {
         }
     };
 
+   
+
     useEffect(() => {
         fetchOrders();
     }, []);
@@ -168,60 +163,7 @@ function OrderHistory() {
 
     return (
         <Container>
-            {id === 6 ? (
-                <>
-                    <h2>Orders</h2>
-                        <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
-                            <Col colSpan={1}>Order ID</Col>
-                            <Col colSpan={1}>Cust. ID</Col>
-                            <Col colSpan={7}>Date/Time</Col>
-                            <Col colSpan={3}>Total</Col>
-                        </Row>
-                        <Accordion className='border border-primary rounded' defaultActiveKey={'0'}>
-                            {orders.map((order, index) => {
-                                const [ date, time ] = order.order_date_time.split('T');
-                                const color = colorList[index % colorList.length];
-                                return (
-                                    <Accordion.Item eventKey={order.id} key={order.id} >
-                                        <Accordion.Header onClick={() => toggleProgressStatus(order.customer_id, order.id, color)}>
-                                            <Row className={`w-100 fs-5 text-center ${color}`} >
-                                                <Col colSpan={1}>{order.id}</Col>
-                                                <Col colSpan={1}>{order.customer_id}</Col>
-                                                <Col className='text-nowrap' colSpan={7}>
-                                                        {date} <br /> {time}
-                                                </Col>
-                                                <Col colSpan={3}>${order.total_amount} </Col>
-                                            </Row>
-                                        </Accordion.Header>
-                                        <Accordion.Body className="bg-body-tertiary text-center text-warning-emphasis" eventKey={order.id.toString()}>
-                                            <Card.Body className='pb-2'>
-                                                <Row className='pb-3 fs-5 pt-2'>
-                                                    <Col colSpan={1}>{tracking[order.id]?.status || 'Loading...'}</Col>
-                                                    <Col colSpan={11}>
-                                                        <ProgressBar className='w-100' now={tracking[order.id]?.percent || 0} variant={tracking[order.id]?.variant || 'secondary'} animated />
-                                                    </Col>
-                                                </Row>
-                                                <Card.Footer>
-                                                <Row className='w-100'>
-                                                    {tracking[order.id].status === 'Order in process' (
-                                                        <>
-                                                            <Col as={Button} variant='outline-warning' onClick={() => handleEditOrder(order.id)} >Edit Order</Col>
-                                                            <Col as={Button} variant='outline-danger' onClick={() => handleDelete(order.id)} >Delete/Cancel</Col>
-                                                        </>
-                                                    )}
-                                                    <Col as={Button} variant='outline-light' onClick={() => handleDetails(order.id)} >More Details</Col>
-                                                </Row>
-                                                </Card.Footer>
-                                            </Card.Body>
-                                        </Accordion.Body>
-                                    </Accordion.Item>
-                                    )
-                                })}
-                        </Accordion>
-                </>
-            ) : (
-                <>
-                    <h2>Order History</h2>
+            <h2>Order History</h2>
                 <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
                     <Col colSpan={2}>Order ID</Col>
                     <Col colSpan={7}>Date/Time</Col>
@@ -264,11 +206,9 @@ function OrderHistory() {
                                     </Card.Body>
                                 </Accordion.Body>
                             </Accordion.Item>
-                            )
-                        })}
-                    </Accordion>
-                </>
-            )}
+                        )
+                    })}
+                </Accordion>
 
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>

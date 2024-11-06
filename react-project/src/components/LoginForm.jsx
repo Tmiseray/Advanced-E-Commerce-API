@@ -5,7 +5,7 @@
 */
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Modal, Spinner, Row, Col } from "react-bootstrap";
 import {Icon} from 'react-icons-kit';
 import {eye, eyeOff} from 'react-icons-kit/feather';
@@ -102,7 +102,7 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
 
     if (isSubmitting) {
         return (
-            <p>
+            <p className="text-center h2">
                 Verifying information 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
@@ -113,7 +113,7 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit} noValidate >
+            <Form className="loginForm p-4 mt-3 rounded" onSubmit={handleSubmit} noValidate >
                 <h3 className="fs-1 text-warning" >Login</h3>
                 <Form.Group as={Row} className="mb-2 p-3" controlId="username" >
                     <Form.Label column sm={2} className="fs-4" >Username:</Form.Label>
@@ -205,5 +205,6 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
         </Container>
     );
 };
+
 
 export default LoginForm;

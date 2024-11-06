@@ -101,7 +101,7 @@ function ProductForm() {
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit} >
+            <Form className="productForm p-4 mt-3" onSubmit={handleSubmit} >
                 <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Product Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
                 <Form.Group as={Row} className="mb-2 p-3" controlId="name" >
@@ -122,7 +122,7 @@ function ProductForm() {
                     </Col>
                 </Form.Group>
                 <Form.Group as={Row} className="mb-3 p-3" controlId="price" >
-                    <Form.Label column sm={2} className="fs-4" >Price:</Form.Label>
+                    <Form.Label column sm={2} className="fs-4" >Price: ($ 00.00)</Form.Label>
                     <Col sm={10} >
                         <Form.Control 
                             className="pb-0"

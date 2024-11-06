@@ -99,7 +99,7 @@ function CustomerForm() {
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit} >
+            <Form className="customerForm p-4 mt-3 rounded" onSubmit={handleSubmit} >
                 <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Contact Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
                 <Form.Group as={Row} className="mb-3 p-3" controlId="name" >

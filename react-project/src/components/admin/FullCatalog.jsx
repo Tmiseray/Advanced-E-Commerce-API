@@ -17,8 +17,10 @@ function FullCatalog() {
     const [products, setProducts] = useState([]);
     const [details, setDetails] = useState({});
     const [deactivateMessage, setDeactivateMessage] = useState('');
+    const [activateMessage, setActivateMessage] = useState('');
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isDeactivating, setIsDeactivating] = useState(false);
+    const [isActivating, setIsActivating] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
     const [activeCatalogKey, setActiveCatalogKey] = useState(null);
     const [currentColor, setCurrentColor] = useState('text-info');
@@ -77,6 +79,8 @@ function FullCatalog() {
     const handleClose = () => {
         if (isDeactivating) {
             setIsDeactivating(false);
+        } else if (isActivating) {
+            setIsActivating(false);
         }
         setShowRedirect(false);
     };
@@ -93,10 +97,26 @@ function FullCatalog() {
         try {
             const response = await axios.put(`http://127.0.0.1:5000/products/deactivate/${id}`);
             setDeactivateMessage(response.data);
+            setDetails(details[id].active === 'Inactive');
         } catch (error) {
             setError('Error deactivating product:', error);
         } finally {
             setIsDeactivating(false);
+        }
+    };
+
+    const handleActivation = async (id) => {
+        setIsActivating(true);
+        setError('');
+
+        try {
+            const response = await axios.put(`http://127.0.0.1:5000/products/activate/${id}`);
+            setActivateMessage(response.data);
+            setDetails(details[id].active === 'Active');
+        } catch (error) {
+            setError('Error activating product:', error.message);
+        } finally {
+            setIsActivating(false);
         }
     };
 
@@ -150,12 +170,33 @@ function FullCatalog() {
         )
     };
 
+    if (isActivating) {
+        return (
+            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
+                <Modal.Header>
+                    <Modal.Title>Activation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Activating Product 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                    <Spinner animation="grow" size="sm" /> 
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant='outline-secondary' onClick={handleClose} >
+                        Continue
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        )
+    };
+
     return (
-        <Container>
+        <Container className="catalogCol mt-3 p-3 mb-5 bg-secondary-subtle rounded">
             <h2>Catalog Stock</h2>
                 <Row className="fs-5 text-center text-decoration-underline ps-3 pe-5  text-secondary-emphasis mb-2">
-                    <Col colSpan={3}>Stock</Col>
                     <Col colSpan={4}>Product Id</Col>
+                    <Col colSpan={3}>Stock</Col>
                     <Col colSpan={5}>Restock</Col>
                 </Row>
                 <Accordion className='border border-primary rounded' defaultActiveKey={'0'}>
@@ -165,8 +206,8 @@ function FullCatalog() {
                             <Accordion.Item key={product.product_id} eventKey={product.product_id}>
                                 <Accordion.Header onClick={() => toggleDetails(product.product_id, color)}>
                                     <Row className={`w-100 fs-5 text-center ${color}`}>
-                                        <Col colSpan={3}>{product.product_stock}</Col>
                                         <Col colSpan={4}>{product.product_id}</Col>
+                                        <Col colSpan={3}>{product.product_stock}</Col>
                                         <Col colSpan={5}>{product.last_restock_date}</Col>
                                     </Row>
                                 </Accordion.Header>
@@ -182,7 +223,15 @@ function FullCatalog() {
                                         <Card.Footer>
                                             <Row className='w-100'>
                                                 <Col as={Button} variant='outline-warning' onClick={() => handleEditProduct(details[product.product_id].id)} >Edit Details</Col>
-                                                <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details[product.product_id].id)} >Deactivate</Col>
+                                                {details[product.product_id] && details[product.product_id].active === 'Inactive' ? (
+                                                    <>
+                                                        <Col as={Button} variant='outline-danger' onClick={() => handleActivation(details[product.product_id].id)} >Activate</Col>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Col as={Button} variant='outline-danger' onClick={() => handleDeactivation(details[product.product_id].id)} >Deactivate</Col>
+                                                    </>
+                                                )}
                                             </Row>
                                         </Card.Footer>
                                     </Card.Body>

@@ -7,24 +7,25 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { object, func } from 'prop-types';
-import { Form, Button, Alert, Modal, Spinner, Container } from "react-bootstrap";
+import { Form, Button, Alert, Modal, Spinner, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
 function OrderForm() {
     const [order, setOrder] = useState([]);
-    const [order_items, setOrderItems] = useState([{
+    const [orderDetails, setOrderDetails] = useState([{
         product_id: '',
         product_name: '',
         quantity: '',
         price_per_unit: ''
     }])
-    const [errors, setErrors] = useState([{}]);
+    const [errors, setErrors] = useState([]);
     const [isFetchingOrder, setIsFetchingOrder] = useState(false);
     const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isSubmitting, setSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    const { customer_id, order_id } = useParams();
+    const [customerId, setCustomerId] = useState('');
+    const { order_id } = useParams();
     const navigate = useNavigate();
     const variantList = ['primary', 'info'];
 
@@ -33,46 +34,77 @@ function OrderForm() {
             axios.get(`http://127.0.0.1:5000/orders/${order_id}`)
                 .then(response => {
                     setOrder(response.data);
-                    setOrderItems(order.order_details);
+                    setOrderDetails(order.order_details);
                 })
                 .catch(error => setErrorMessage(error.message));
-        }
+            }
+        getStorageItems();
     }, [order_id]);
 
+    const getStorageItems = () => {
+        const storedId = JSON.parse(sessionStorage.getItem('id'));
+        setCustomerId(storedId);
+    };
+
     const handleAddInputs = () => {
-        setOrderItems([...order_items, { product_id: '', product_name: '', quantity: '', price_per_unit: '' }]);
+        const updatedDetails = [...orderDetails, { product_id: '', product_name: '', quantity: '', price_per_unit: '' }]
+        setOrderDetails(updatedDetails);
     };
 
     const handleChange = (event, index) => {
         let { name, value } = event.target;
-        let onChangeValue = [...order_items];
-        onChangeValue[index][name] = value;
-        setOrderItems(onChangeValue);
+        let onChangeValue = [...orderDetails];
+        onChangeValue[index][name] = value || '';
+        setOrderDetails(onChangeValue);
     };
 
     const handleDeleteInput = (index) => {
-        const newItems = [...order_items];
+        const newItems = [...orderDetails];
         newItems.splice(index, 1);
-        setOrderItems(newItems);
+        setOrderDetails(newItems);
     }
 
     const validateForm = () => {
-        let errors = [{}];
-        if (!order_items.product_id && !order_items.product_name) errors.index = 'Either Product ID or Name is required';
-        if (order_items.quantity === '' ) errors.index = 'Quantity is required';
+        let errors = [];
+    
+        orderDetails.forEach((item, index) => {
+            if (!item.product_id && !item.product_name) {
+                errors[index] = errors[index] || {};
+                errors[index].product = 'Product ID and Name are required';
+            }
+            if (!item.quantity) {
+                errors[index] = errors[index] || {};
+                errors[index].quantity = 'Quantity is required';
+            }
+        });
+    
         setErrors(errors);
-        return Object.keys(errors).length === 0;
+        return errors.length === 0;
     };
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        if (!validateForm()) return;
         setSubmitting(true);
+        console.log('Submit clicked');
+        console.log("Submitting order with customerId:", customerId);
+        console.log("Sending order details:", orderDetails); 
+
+        if (!validateForm()) return;
+
+        const formattedOrderDetails = orderDetails.map(item => ({
+            product_id: item.product_id || null,
+            product_name: item.product_name || null,
+            quantity: item.quantity,
+            price_per_unit: item.price_per_unit || null,
+        }))
+
+        console.log(formattedOrderDetails)
+
         try {
             if (order_id) {
-                await axios.put(`http://127.0.0.1:5000/orders/${order_id}`, order_items);
+                await axios.put(`http://127.0.0.1:5000/orders/${order_id}`, { order_details: formattedOrderDetails});
             } else {
-                await axios.post(`http://127.0.0.1:5000/place-order/?customer_id=${customer_id}`, order_items);
+                await axios.post(`http://127.0.0.1:5000/place-order/?customer_id=${customerId}`, { order_details: formattedOrderDetails});
             }
             setShowSuccess(true);
         } catch (error) {
@@ -95,28 +127,29 @@ function OrderForm() {
     };
 
     if (isSubmitting) return 
-        <p>
+        <div>
             Submitting order 
             <Spinner animation="grow" size="sm" /> 
             <Spinner animation="grow" size="sm" /> 
             <Spinner animation="grow" size="sm" /> 
-        </p>;
+        </div>;
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit} >
-                <h3>{id ? 'Edit' : 'Add'} Order Information</h3>
+            <Form className="orderForm p-4 mt-3 rounded" onSubmit={handleSubmit} >
+                <h3 className="fs-1">{order_id ? 'Edit' : 'Add'} Order Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
                 {orderDetails.map((item, index) => (
-                    <div className="detailsContainer" key={index} >
-                        <Form.Group as={Row} className="mb-3 p-3" controlId="quantity" >
-                            <Form.Label column sm={2} className="fs-4" >Quantity:</Form.Label>
-                            <Col sm={10} >
+                    <div key={index} >
+                        <Form.Group as={Row} className="mb-3 p-3" controlId={`quantity${index}`} >
+                            <Form.Label column sm={3} className="fs-4" >Quantity:</Form.Label>
+                            <Col sm={9} >
                                 <Form.Control 
                                     className="pb-0"
-                                    type="number"
+                                    size="lg"
+                                    type="text"
                                     name="quantity"
-                                    value={item.quantity}
+                                    value={item[index].quantity || ''}
                                     onChange={(event) => handleChange(event, index)}
                                     isInvalid={!!errors.index}
                                 />
@@ -125,14 +158,15 @@ function OrderForm() {
                                 </Form.Control.Feedback>
                             </Col>
                         </Form.Group>
-                        <Form.Group as={Row} className="mb-3 p-3" controlId="productId" >
-                            <Form.Label column sm={2} className="fs-4" >Product ID:</Form.Label>
-                            <Col sm={10} >
+                        <Form.Group as={Row} className="mb-3 p-3" controlId={`productId${index}`} >
+                            <Form.Label column sm={3} className="fs-4" >Product ID:</Form.Label>
+                            <Col sm={9} >
                                 <Form.Control 
                                     className="pb-0"
+                                    size="lg"
                                     type="number"
                                     name="productId"
-                                    value={item.productId}
+                                    value={item[index].productId || ''}
                                     onChange={(event) => handleChange(event, index)}
                                     isInvalid={!!errors.index}
                                 />
@@ -141,14 +175,15 @@ function OrderForm() {
                                 </Form.Control.Feedback>
                             </Col>
                         </Form.Group>
-                        <Form.Group as={Row} className="mb-3 p-3" controlId="productName" >
-                            <Form.Label column sm={2} className="fs-4" >Product Name:</Form.Label>
-                            <Col sm={10} >
+                        <Form.Group as={Row} className="mb-3 p-3" controlId={`productName${index}`} >
+                            <Form.Label column sm={3} className="fs-4" >Product Name:</Form.Label>
+                            <Col sm={9} >
                                 <Form.Control 
                                     className="pb-0"
+                                    size="lg"
                                     type="text"
                                     name="productName"
-                                    value={item.productName}
+                                    value={item[index].productName || ''}
                                     onChange={(event) => handleChange(event, index)}
                                     isInvalid={!!errors.index}
                                 />
@@ -157,18 +192,20 @@ function OrderForm() {
                                 </Form.Control.Feedback>
                             </Col>
                         </Form.Group>
-                        {orderDetails.length > 1 && (
-                            <Button className="w-50 fs-4" variant="outline-danger" onClick={() => handleDeleteInput(index)} >Delete</Button>
-                        )}
-                        {index === orderDetails.length - 1 && (
-                            <Button className="w-50 fs-4" variant="outline-success" onClick={() => handleAddInputs()} >Add</Button>
+                        {orderDetails.length > 1 ? (
+                            <>
+                            <Button className="w-50 fs-4" variant="outline-success" onClick={() => handleAddInputs()} >Add Another Product</Button>
+                            <Button className="w-50 fs-4" variant="outline-danger" onClick={() => handleDeleteInput(index)} >Delete Product</Button>
+                            </>
+                        ):(
+                            <Button className="w-50 fs-4" variant="outline-success" onClick={() => handleAddInputs()} >Add Another Product</Button>
                         )}
                     </div>
                 ))}
 
-                <div className="body" >{JSON.stringify(orderDetails)} </div>
+                {/* <div className="body" >{JSON.stringify(orderDetails)} </div> */}
 
-                <Button className="w-100 fs-4" variant="outline-info" type="submit" disabled={isSubmitting} >
+                <Button className="w-100 fs-4 mt-5" variant="outline-info" type="submit" disabled={isSubmitting} >
                     {isSubmitting ? <Spinner as='span' animation="border" size="sm" /> : 'Submit' }
                 </Button>
             </Form>

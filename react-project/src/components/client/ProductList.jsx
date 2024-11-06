@@ -12,11 +12,15 @@ function ProductList() {
     const [products, setProducts] = useState([]);
     const [isFetching, setIsFetching] = useState(false);
     const [showRedirect, setShowRedirect] = useState(false);
-    const { customerId } = useParams();
+    const [customerId, setCustomerId] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const variantList = ['primary', 'info'];
 
+    const getStorageItems = () => {
+        const storedId = JSON.parse(sessionStorage.getItem('id'));
+        setCustomerId(storedId);
+    };
 
     const fetchProducts = async () => {
         setIsFetching(true);
@@ -48,17 +52,21 @@ function ProductList() {
     };
 
     useEffect(() => {
+        getStorageItems();
+    }, [customerId]);
+
+    useEffect(() => {
         fetchProducts();
     }, []);
 
     if (isFetching) {
         return (
-            <p>
+            <div>
                 Fetching Products 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
-            </p>
+            </div>
         )
     };
 
@@ -66,20 +74,20 @@ function ProductList() {
         <Container>
             <h2 className='text-warning mb-5 h1' >Products</h2>
                 {error && <p className="text-danger">{error}</p>}
-                {products.length === 0 ? (
-                    <p>No products available.</p>
-                ) : (
-                    products.map((product, index) => {
-                        const currentVariant = variantList[index % variantList.length];
-                        return (
-                        <ListGroup key={product.id} horizontal onClick={() => setShowRedirect(true)} >
-                            <ListGroup.Item action variant={currentVariant}>ID: {product.id} </ListGroup.Item>
-                            <ListGroup.Item action variant={currentVariant}>{product.name} </ListGroup.Item>
-                            <ListGroup.Item action variant={currentVariant}> ${product.price} </ListGroup.Item>
-                        </ListGroup>
-                        );
-                    })
-                )}
+                    {products.length === 0 ? (
+                        <p>No products available.</p>
+                    ) : (
+                        products.map((product, index) => {
+                            const currentVariant = variantList[index % variantList.length];
+                            return (
+                            <ListGroup className='productsContainer' key={product.id} horizontal onClick={() => setShowRedirect(true)} >
+                                <ListGroup.Item action variant={currentVariant}>ID: {product.id} </ListGroup.Item>
+                                <ListGroup.Item action variant={currentVariant}>{product.name} </ListGroup.Item>
+                                <ListGroup.Item action variant={currentVariant}> ${product.price} </ListGroup.Item>
+                            </ListGroup>
+                            );
+                        })
+                    )}
 
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>

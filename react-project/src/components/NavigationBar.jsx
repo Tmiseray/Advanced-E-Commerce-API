@@ -10,7 +10,7 @@ function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
     const id = sessionStorage.getItem('id');
 
     return (
-        <Navbar fixed='top' bg='black' className="shadow-lg" >
+        <Navbar fixed='top' bg='black' className="navBar" >
             <Container>
                 <Navbar.Brand href="/" >
                     <Image src="./src/assets/EmpireLuxLogo.png" alt="Logo" thumbnail/>
@@ -46,9 +46,14 @@ function NavigationBar({ handleLogout, isLoggedIn, isAdmin }) {
                         }
                         {isLoggedIn 
                             ? (isAdmin
-                                ? <Nav.Link as={NavLink} to='/customers' className="navLink" activeclassname='active' >
-                                    Customers
-                                </Nav.Link>
+                                ? <>
+                                    <Nav.Link as={NavLink} to='/customers' className="navLink" activeclassname='active' >
+                                        Customers
+                                    </Nav.Link>
+                                    <Nav.Link as={NavLink} to='/admin-profile' className="navLink" activeclassname='active' >
+                                        Admin Profile
+                                    </Nav.Link>
+                                </>
                                 : <Nav.Link as={NavLink} to={`/customer-profile/${id}`} className="navLink" activeclassname='active' >
                                     Profile
                                 </Nav.Link>)

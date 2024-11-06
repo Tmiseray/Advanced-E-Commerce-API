@@ -3,7 +3,7 @@
 */
 
 
-import { Stack, Button, Container, Card, Image } from "react-bootstrap";
+import { Button, Container } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 
 function HomePage() {
@@ -11,7 +11,7 @@ function HomePage() {
 
     return (
         <div className="p-5" >
-            <Container className="d-flex align-items-center justify-content-center bg-body-secondary" >
+            <Container className="headerContainer mb-4 d-flex align-items-center justify-content-center bg-body-secondary" >
                 <header className="text-center p-5" >
                     <h1 className="text-decoration-underline text-warning mb-3" >
                         EMPIRE LUX

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 import FullCatalog from "./FullCatalog";
 import OrderList from "./OrderList";
 import StockMonitor from "./StockMonitor";
-// import OrderHistory from "../OrderHistory";
+import OrderHistory from "../OrderHistory";
 
 
 function AdminProfile() {
@@ -106,7 +106,28 @@ function AdminProfile() {
 
 
     return (
-        <Container className="bg-body-secondary p-3 mt-3 pb-5" >
+        <>
+        <Container className="adminNav bg-warning-subtle h-100" >
+            <Nav>
+                <div className="d-grid">
+                    <StockMonitor products={products} />
+                    <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
+                    <Button type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
+                        Add Product
+                    </Button>
+                    {/* <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                        Monitor Stock
+                    </Button>
+                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                        Edit Login Info
+                    </Button>
+                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
+                        Contact Us
+                    </Button> */}
+                </div>
+            </Nav>
+        </Container>
+        <Container className="adminContainer bg-body-secondary p-3 mt-3 pb-5 mb-5" >
             <header className="text-center p-5">
                 <h1 className="text-decoration-underline text-warning mb-3" >
                     Administration Manager
@@ -114,30 +135,8 @@ function AdminProfile() {
             </header>
             <Container fluid >
                 <Row className="g-3" >
-                    <Col xs={2} >
-                        <Container className="bg-warning-subtle h-100 border border-3 border-warning-subtle" >
-                            <Nav className=''>
-                                <div className="d-grid g-3">
-                                    <StockMonitor products={products} />
-                                    <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
-                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
-                                        Add Product
-                                    </Button>
-                                    {/* <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                                        Monitor Stock
-                                    </Button>
-                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                                        Edit Login Info
-                                    </Button>
-                                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                                        Contact Us
-                                    </Button> */}
-                                </div>
-                            </Nav>
-                        </Container>
-                    </Col>
                     <Col colspan={10} >
-                            <Row className="ms-1 me-1 p-3 bg-success-subtle text-success-emphasis border border-3 border-success-subtle">
+                            <Row className="salesRow ms-1 me-1 p-3 bg-success-subtle text-success-emphasis">
                                     <Col>
                                         <h2>Total Sales</h2>
                                         <h3 className="text-decoration-none fw-bold fs-2">${salesTotal}</h3>
@@ -149,34 +148,35 @@ function AdminProfile() {
                                     </Col>
                             </Row>
                             <Row className="m-1">
-                                <Col colSpan={4} className="mt-1 p-2 bg-secondary-subtle shadow-lg border border-3 border-light-subtle">
+                                <Col colSpan={4} >
                                     <FullCatalog />
                                 </Col>
-                                <Col colSpan={7} className="mt-1 ms-3 me-0 p-2 bg-dark-subtle shadow-lg border border-3 border-secondary">
+                                <Col colSpan={7} className="">
                                     <OrderList />
                                     {/* <OrderHistory /> */}
                                 </Col>
                             </Row>
-                    </Col>
-                </Row>
+                        </Col>
+                    </Row>
+                </Container>
+                <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
+                    <Modal.Header>
+                        <Modal.Title>Redirection</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        Redirecting you <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <Button variant='outline-secondary' onClick={handleClose} >
+                            Back to Profile
+                        </Button>
+                        <Button variant='outline-primary' onClick={handleClose} >
+                            Continue
+                        </Button>
+                    </Modal.Footer>
+                </Modal>
             </Container>
-            <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
-                <Modal.Header>
-                    <Modal.Title>Redirection</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Redirecting you <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant='outline-secondary' onClick={handleClose} >
-                        Back to Profile
-                    </Button>
-                    <Button variant='outline-primary' onClick={handleClose} >
-                        Continue
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        </Container>
+        </>
     )
 };
 

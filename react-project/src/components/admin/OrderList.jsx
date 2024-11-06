@@ -154,7 +154,7 @@ function OrderList() {
     };
 
     return (
-        <Container>
+        <Container className='orderCol mt-3 p-3 mb-5 bg-dark-subtle rounded'>
             <h2>Orders</h2>
                 <Row className="fs-5 text-center ps-3 pe-5 text-decoration-underline text-secondary-emphasis">
                     <Col colSpan={1}>Order ID</Col>

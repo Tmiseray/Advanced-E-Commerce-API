@@ -66,9 +66,10 @@ function StockMonitor({products}) {
                 messages.push("No products below threshold to restock.");
             } else {
                 messages.push(messageData['message']);
+                setProductsBelowThreshold(product => {
+                    product.product_stock += 20;
+                })
             }
-            
-
             setModalMessage(messages);
             setShowMessage(true);
         } catch (error) {

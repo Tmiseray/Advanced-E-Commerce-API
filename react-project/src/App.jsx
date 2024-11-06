@@ -21,7 +21,6 @@ import NavigationBar from './components/NavigationBar';
 import NotFound from './components/NotFound';
 import OrderDetails from './components/OrderDetails';
 // Styles
-
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 import { useEffect, useState } from 'react';
@@ -41,7 +40,7 @@ function App() {
     setIsAdmin(userData.isAdmin);
     sessionStorage.setItem('name', JSON.stringify(userData.name));
     sessionStorage.setItem('id', JSON.stringify(userData.id));
-    sessionStorage.setItem('username', JSON.stringify(userData.username));
+    sessionStorage.setItem('username', userData.username);
     sessionStorage.setItem('isLoggedIn', true);
     sessionStorage.setItem('isAdmin', userData.isAdmin);
 
@@ -116,4 +115,4 @@ function App() {
   )
 }
 
-export default App
+export default App;

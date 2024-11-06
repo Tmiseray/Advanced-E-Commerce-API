@@ -3,9 +3,8 @@ import { Container, Row, Col, Image, Nav } from "react-bootstrap";
 
 function Footer() {
     return (
-        <Container className='justify-content-between alight-items-center text-center' >
-            <p>Work in progress</p>
-            <Footer className='bg-black shadow-lg ' >
+        
+            <footer className='bg-black justify-content-between alight-items-center text-center w-100' >
                 <Row>
                     <Col></Col>
                     <Col>
@@ -15,8 +14,8 @@ function Footer() {
                     </Col>
                     <Col></Col>
                 </Row>
-            </Footer>
-        </Container>
+            </footer>
+        
     );
 };
 

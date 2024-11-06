@@ -7,20 +7,19 @@
 */
 
 import axios from 'axios';
-import { array, func } from 'prop-types';
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import { Button, Container, ListGroup, Modal, Spinner, Table } from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
+import { Button, Container, Accordion, Modal, Spinner, Card, Row, Col } from "react-bootstrap";
 
 function CustomerList() {
     const [customers, setCustomers] = useState([]);
-    const [customerAccount, setCustomerAccount] = useState([]);
+    const [customersAccounts, setCustomersAccounts] = useState({});
     const [isFetchingCustomers, setIsFetchingCustomers] = useState(false);
     const [isFetchingAccount, setIsFetchingAccount] = useState(false);
     const [isDeletingCustomer, setIsDeletingCustomer] = useState(false);
+    const [activeAccountKey, setActiveAccountKey] = useState(null);
     const [deleteMessage, setDeleteMessage] = useState('');
     const [showRedirect, setShowRedirect] = useState(false);
-    const { username } = useParams();
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
@@ -37,6 +36,7 @@ function CustomerList() {
         try {
             const response = await axios.get('http://127.0.0.1:5000/customers');
             setCustomers(response.data);
+            console.log(response.data);
         } catch (error) {
             setError('Error fetching customers:', error)
         } finally {
@@ -52,13 +52,19 @@ function CustomerList() {
 
         try {
             const response = await axios.get(`http://127.0.0.1:5000/accounts/${customerId}`);
-            setCustomerAccount(response.data);
-            console.log(response.data);
+            const accountData = response.data;
+            setCustomersAccounts((prevAccounts) => ({
+                ...prevAccounts,
+                [customerId]: {
+                    username: accountData.username,
+                    password: accountData.password
+                },
+            }))
+            console.log(accountData);
         } catch (error) {
             console.error(error.message);
             setError('Error fetching customer account:', error.message);
         } finally {
-            // clearTimeout(timeoutId);
             setIsFetchingAccount(false);
         }
     };
@@ -68,10 +74,11 @@ function CustomerList() {
     };
 
     const toggleAccount = (id) => {
-        if (customerAccount && customerAccount.customer_id === id) {
-            setCustomerAccount([]);
+        if (activeAccountKey && activeAccountKey === id) {
+            setActiveAccountKey(null);
         } else {
             fetchCustomerAccount(id);
+            setActiveAccountKey(id);
         }
     };
 
@@ -84,6 +91,11 @@ function CustomerList() {
         setShowRedirect(true);
         navigate(`/accounts/${id}`)
     };
+
+    const handleCreateAccount = (id) => {
+        setShowRedirect(true);
+        navigate(`/create-account/${id}`);
+    }
 
     const handleDeletion = async (id) => {
         setIsDeletingCustomer(true);
@@ -104,25 +116,14 @@ function CustomerList() {
         fetchCustomers();
     }, []);
 
-    if (isFetchingCustomers) {
+    if (isFetchingCustomers || isFetchingAccount) {
         return  (
-            <p>
+            <div>
                 Fetching Customers 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
-            </p>
-        )
-    };
-
-    if (isFetchingAccount) {
-        return (
-            <p>
-                Fetching Account Details 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-                <Spinner animation="grow" size="sm" /> 
-            </p>
+            </div>
         )
     };
 
@@ -149,83 +150,104 @@ function CustomerList() {
 
 
     return (
-        <Container>
-            <h2 className='text-warning mb-5 h1' >Customers</h2>
-                {error && <p className="text-danger">{error}</p>}
-                <Table striped hover >
-                    <thead>
-                        <tr>
-                            <th className='text-center'>ID</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th className='text-center' colSpan={2}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.length === 0 ? (
-                            <tr>
-                                <td colSpan={5}>No customers registered.</td>
-                            </tr>
-                        ) : (
-                            customers.map(customer => (
-                                <React.Fragment key={customer.id}>
-                                    <tr>
-                                        <td className='text-center'>{customer.id}</td>
-                                        <td>{customer.name} </td>
-                                        <td>{customer.email} </td>
-                                        <td>{customer.phone} </td>
-                                        <td>
-                                            <Button variant='outline-info' onClick={() => toggleAccount(customer.id)}>
-                                                {customerAccount && customerAccount.customer_id === customer.id ? 'Hide Account' : 'Show Account' }
-                                            </Button>
-                                        </td>
-                                        <td>
-                                            <Button variant='outline-warning' onClick={() => handleEditContact(customer.id)}>
-                                                Edit Contact Info
-                                            </Button>
-                                        </td>
-                                    </tr>
-                                    {customerAccount.customer_id === customer.id && (
-                                        customerAccount.length === 0 ? (
-                                            <tr>
-                                                <td className='text-center' colSpan={6}>This customer has no login details at this time.</td>
-                                            </tr>
-                                        ) : (
-                                            <tr>
-                                                <td className='pt-2'>
-                                                    <strong>Login Info:</strong>
-                                                    <div className='text-primary-emphasis'>Username: </div>
-                                                    <div className='text-danger-emphasis'>Password: </div>
-                                                </td>
-                                                <td className='align-content-end' colSpan={3}>
-                                                    <div>{customerAccount.username}</div>
-                                                    <div>{customerAccount.password}</div>
-                                                </td>
-                                                <td>
-                                                    <Button variant='outline-info' onClick={() => handleEditAccount(customerAccount.customer_id)}>
-                                                        Edit Account Info
-                                                    </Button>
-                                                </td>
-                                                <td>
-                                                    <Button variant='outline-danger' onClick={() => handleDeletion(customerAccount.customer_id)}>
-                                                        Delete Customer
-                                                    </Button>
-                                                </td>
-                                            </tr>
-                                        )
-                                    )}
-                               </React.Fragment>
-                            ))
-                        )}
-                    </tbody>
-            </Table>
+        <Container fluid className='customerContainer mt-5 p-3 mb-5 bg-info-subtle rounded'>
+            <h2 className='text-info mb-5 h1' >Customers</h2>
+                {error && <div className="text-danger">{error}</div>}
+                <Row className='fs-4 fw-bold text-center text-decoration-underline text-secondary-emphasis'>
+                    <Col colSpan={1}>ID</Col>
+                    <Col colSpan={1}>Name</Col>
+                    <Col colSpan={5}>Email</Col>
+                    <Col colSpan={2}>Phone</Col>
+                    <Col colSpan={2}>Actions</Col>
+                </Row>
+                <Accordion className='border border-primary rounded mb-5' defaultActiveKey={'0'}>
+                    {customers.length === 0 ? (
+                        <Accordion.Header>No Customers Registered.</Accordion.Header>
+                    ) : (
+                        customers.map(customer => (
+                            <Accordion.Item eventKey={customer.id} key={customer.id}>
+                                <Accordion.Header onClick={() => toggleAccount(customer.id)}>
+                                    <Row className='align-items-center text-center w-100 fs-5'>
+                                        <Col colSpan={1}>{customer.id}</Col>
+                                        <Col colSpan={1}>{customer.name}</Col>
+                                        <Col colSpan={5}>{customer.email}</Col>
+                                        <Col colSpan={2}>{customer.phone}</Col>
+                                        <Col colSpan={2}>
+                                            <Row className='mb-5'>
+                                                <Button className='fs-5' variant='outline-info'>
+                                                    Account Details
+                                                </Button>
+                                            </Row>
+                                            <Row>
+                                                <Button className='fs-5' variant='outline-warning' onClick={() => handleEditContact(customer.id)}>
+                                                    Edit Contact Info
+                                                </Button>
+                                            </Row>
+                                        </Col>
+                                    </Row>
+                                </Accordion.Header>
+                                <Accordion.Body className='bg-body-tertiary' eventKey={customer.id.toString()}>
+                                    <Card.Body>
+                                        <Row className='pb-3 fs-5 align-items-center'>
+                                            <Col colSpan={3} className='loginCol'>
+                                                <strong>Login Info:</strong>
+                                                <Row className='text-primary-emphasis'>Username: </Row>
+                                                <Row className='text-danger-emphasis'>Password: </Row>
+                                            </Col>
+                                            <Col className='mb-0 pb-0'>
+                                                <Row className='pt-4 mt-3'></Row>
+                                                <Row>{customersAccounts[customer.id]?.username || 'None'}</Row>
+                                                <Row className='pe-5'>{customersAccounts[customer.id]?.password || 'None'}</Row>
+                                            </Col>
+                                            <Col colSpan={1} className='me-4'>
+                                                {customersAccounts[customer.id] && customersAccounts[customer.id].username !== undefined ? (
+                                                    <>
+                                                        <Row className='mb-3'>
+                                                            <Button className='fs-5' variant='outline-info' onClick={() => handleEditAccount(customersAccounts.id.customer_id)}>
+                                                                Edit Account Info
+                                                            </Button>
+                                                        </Row>
+                                                        <Row>
+                                                            <Button className='fs-5' variant='outline-danger' onClick={() => handleDeletion(customersAccounts[customer.id].customer_id)}>
+                                                                Delete Customer
+                                                            </Button>
+                                                        </Row>
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Row className='mb-3'>
+                                                            <Button className='fs-5' variant='outline-info' onClick={() => handleEditAccount(customersAccounts.id.customer_id)}>
+                                                                Create Account Login
+                                                            </Button>
+                                                        </Row>
+                                                        <Row>
+                                                            <Button className='fs-5' variant='outline-danger' onClick={() => handleDeletion(customersAccounts[customer.id].customer_id)}>
+                                                                Delete Customer
+                                                            </Button>
+                                                        </Row>
+                                                    </>
+                                                )}
+                                            </Col>
+                                        </Row>
+                                        <Card.Footer>
+                                            <Row className='w-100'>
+                                                
+                                            </Row>
+                                        </Card.Footer>
+                                    </Card.Body>
+                                </Accordion.Body>
+                            </Accordion.Item>
+                        ))
+                    )}
+                </Accordion>
+                
+                    
             <Modal className="text-center" show={showRedirect} onHide={handleClose} backdrop='static' keyboard={false} centered >
                 <Modal.Header>
                     <Modal.Title>Redirection</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Redirecting you to edit details for {customerAccount.customer_id} <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
+                    Redirecting you to update details for customer <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> <Spinner animation="grow" size="sm" /> 
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant='outline-secondary' onClick={() => setShowRedirect(false)} >

@@ -24,7 +24,7 @@ function AccountForm() {
 
     useEffect(() => {
         if (id) {
-            axios.get(`http://127.0.0.1:5000/accounts/${+id}`)
+            axios.get(`http://127.0.0.1:5000/accounts/${id}`)
                 .then(response => {
                     setAccount(response.data);
                 })
@@ -112,7 +112,7 @@ function AccountForm() {
 
     return (
         <Container>
-            <Form onSubmit={handleSubmit} >
+            <Form className="accountForm p-4 mt-3 rounded" onSubmit={handleSubmit} >
                 <h3 className="fs-1 text-warning" >{id ? 'Edit' : 'Add'} Account Information</h3>
                 {errorMessage && <Alert variant="danger" >{errorMessage}</Alert> }
                 <Form.Group as={Row} className="mb-2 p-3" controlId="accountUsername" >
