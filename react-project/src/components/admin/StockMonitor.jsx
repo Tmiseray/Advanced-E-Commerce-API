@@ -9,8 +9,9 @@ import { useEffect, useState } from "react";
 import { array, func } from 'prop-types';
 import { Container, Badge, Button, Spinner, ListGroup, Modal } from "react-bootstrap";
 import axios from "axios";
+import { redirectDocument } from "react-router-dom";
 
-function StockMonitor({products, onRestock}) {
+function StockMonitor({products}) {
     const [productsBelowThreshold, setProductsBelowThreshold] = useState([]);
     const [numProductsToStock, setNumProductsToStock] = useState(0);
     const [productDetails, setProductDetails] = useState({});
@@ -71,7 +72,6 @@ function StockMonitor({products, onRestock}) {
             setModalMessage(messages);
             setShowMessage(true);
             setProductsBelowThreshold([]);
-            onRestock();
                 
         } catch (error) {
             console.error('Error restocking products:', error.response ? error.response.data : error.message);
@@ -89,6 +89,8 @@ function StockMonitor({products, onRestock}) {
         } catch (error) {
             console.error('Error fetching product details:', error);
             setError(error);
+        } finally {
+            redirectDocument('/admin-profile');
         }
     };
 
@@ -165,5 +167,4 @@ export default StockMonitor;
 
 StockMonitor.propTypes = {
     products: array,
-    onRestock: func
 }

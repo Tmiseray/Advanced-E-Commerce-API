@@ -78,9 +78,9 @@ function AdminProfile() {
         setWeeklySales(total_sales);
     };
 
-    const handleRestock = () => {
-        fetchCatalog()
-    };
+    // const handleRestock = () => {
+    //     fetchCatalog()
+    // };
 
 
     const handleClose = () => {
@@ -101,7 +101,7 @@ function AdminProfile() {
 
         loadOrders();
         loadProducts();
-    }, [])
+    }, [products, customerOrders])
 
     useEffect(() => {
         calcSalesTotal();
@@ -114,20 +114,11 @@ function AdminProfile() {
         <Container className="adminNav bg-warning-subtle h-100" >
             <Nav>
                 <div className="d-grid">
-                    <StockMonitor products={products} onRestock={handleRestock} />
+                    <StockMonitor products={products} />
                     <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
                     <Button type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
                         Add Product
                     </Button>
-                    {/* <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                        Monitor Stock
-                    </Button>
-                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                        Edit Login Info
-                    </Button>
-                    <Button as={NavLink} type="button" variant="outline-warning" activeclassname='active' onClick={d} >
-                        Contact Us
-                    </Button> */}
                 </div>
             </Nav>
         </Container>
