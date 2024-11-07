@@ -11,16 +11,34 @@ import { Container, Badge, Button, Spinner, ListGroup, Modal } from "react-boots
 import axios from "axios";
 import { redirectDocument } from "react-router-dom";
 
-function StockMonitor({products}) {
+function StockMonitor() {
     const [productsBelowThreshold, setProductsBelowThreshold] = useState([]);
     const [numProductsToStock, setNumProductsToStock] = useState(0);
     const [productDetails, setProductDetails] = useState({});
+    const [products, setProducts] = useState([]);
     const [modalMessage, setModalMessage] = useState([]);
     const [showMessage, setShowMessage] = useState(false);
     const [showAlert, setShowAlert] = useState(false);
     const [isRestocking, setIsRestocking] = useState(false);
     const [error, setError] = useState('');
     const threshold = 10;
+
+    const fetchCatalog = async () => {
+        setError('');
+    
+        const timeoutDuration = 10000;
+        const timeoutId = setTimeout(() => {
+        }, timeoutDuration);
+    
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/catalog');
+            setProducts(response.data);
+        } catch (error) {
+            setError('Error fetching products:', error)
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    };
 
     const fetchProductDetails = async () => {
         const belowThreshold = products.filter(product => product.product_stock <= threshold);
@@ -68,11 +86,13 @@ function StockMonitor({products}) {
                 messages.push("No products below threshold to restock.");
             }
 
-            messages.push(messageData['message']);
+            messages.push(messageData['message'], messageData['Restocking Details']);
+            console.log(messageData);
+
             setModalMessage(messages);
             setShowMessage(true);
             setProductsBelowThreshold([]);
-                
+            handleUpdateProducts(messages);
         } catch (error) {
             console.error('Error restocking products:', error.response ? error.response.data : error.message);
             setError('Error restocking products');
@@ -80,6 +100,22 @@ function StockMonitor({products}) {
             setIsRestocking(false);
         }
     };
+
+    const handleUpdateProducts = (stockData) => {
+        stockData['Restocking Details'].map(stock => {
+            if (stock.product_id === products.product_id) {
+
+                setProducts(prevProducts => ([
+                    ...prevProducts,
+                    {[stock.product_id]: {
+                        product_id: products.product_id,
+                        product_stock: stock.new_stock_quantity,
+                        last_restock_date: stock.last_restock_date,
+                    }}
+                ]))
+            }
+        })
+    }
     
     const handleReload = async () => {
         setShowMessage(false);
@@ -89,12 +125,15 @@ function StockMonitor({products}) {
         } catch (error) {
             console.error('Error fetching product details:', error);
             setError(error);
-        } finally {
-            // redirectDocument('/admin-profile');
         }
     };
 
     useEffect(() => {
+        fetchCatalog();
+    }, []);
+
+    useEffect(() => {
+        
         fetchProductDetails();
     }, [products]);
     
@@ -165,6 +204,7 @@ function StockMonitor({products}) {
 
 export default StockMonitor;
 
-StockMonitor.propTypes = {
-    products: array,
-}
+// StockMonitor.propTypes = {
+//     products: array,
+//     setProducts: func
+// }

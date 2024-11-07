@@ -130,9 +130,18 @@ function FullCatalog() {
         }
     };
 
+    // useEffect(() => {
+    //     if (!catalogProducts) {
+    //         fetchCatalog();
+    //     } else {
+    //         setProducts(catalogProducts);
+    //     }
+    // }, [products]);
+
     useEffect(() => {
         fetchCatalog();
     }, [products]);
+
 
     useEffect(() => {
         console.log('Details State updated:', details);
@@ -140,12 +149,12 @@ function FullCatalog() {
 
     if (isFetchingDetails) {
         return (
-            <p>
+            <div>
                 Fetching Product Details 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
                 <Spinner animation="grow" size="sm" /> 
-            </p>
+            </div>
         )
     };
 

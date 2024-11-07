@@ -64,7 +64,7 @@ function LoginForm({ handleLogin, handleSuccessLogin }) {
         if (!validateForm()) return;
         setIsSubmitting(true);
         try {
-            const response = await axios.post('http://127.0.0.1:5000/login', {username, password} );
+            const response = await axios.post('http://127.0.0.1:5000/login', {username, password});
             setId(response.data.id);
             if (username === 'admin#1A') {
                 setIsAdmin(true);

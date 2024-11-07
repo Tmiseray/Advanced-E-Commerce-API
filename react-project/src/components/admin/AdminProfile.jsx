@@ -11,7 +11,7 @@ import OrderHistory from "../OrderHistory";
 
 function AdminProfile() {
     const [products, setProducts] = useState([]);
-    const [customerOrders, setOrders] = useState([]);
+    // const [customerOrders, setOrders] = useState([]);
     const [salesTotal, setSalesTotal] = useState('');
     const [weeklySales, setWeeklySales] = useState('');
     const [error, setError] = useState('');
@@ -19,68 +19,82 @@ function AdminProfile() {
     const [isDeactivating, setIsDeactivating] = useState(false);
     const navigate = useNavigate();
 
-    const fetchCatalog = async () => {
-        setError('');
+    // const fetchCatalog = async () => {
+    //     setError('');
     
-        const timeoutDuration = 10000;
-        const timeoutId = setTimeout(() => {
-        }, timeoutDuration);
+    //     const timeoutDuration = 10000;
+    //     const timeoutId = setTimeout(() => {
+    //     }, timeoutDuration);
     
-        try {
-            const response = await axios.get('http://127.0.0.1:5000/catalog');
-            setProducts(response.data);
-        } catch (error) {
-            setError('Error fetching products:', error)
-        } finally {
-            clearTimeout(timeoutId);
-        }
-    };
+    //     try {
+    //         const response = await axios.get('http://127.0.0.1:5000/catalog');
+    //         setProducts(response.data);
+    //     } catch (error) {
+    //         setError('Error fetching products:', error)
+    //     } finally {
+    //         clearTimeout(timeoutId);
+    //     }
+    // };
 
 
-    const fetchOrders = async () => {
-        setError('');
+    // const fetchOrders = async () => {
+    //     setError('');
     
-        const timeoutDuration = 10000;
-        const timeoutId = setTimeout(() => {
-        }, timeoutDuration);
+    //     const timeoutDuration = 10000;
+    //     const timeoutId = setTimeout(() => {
+    //     }, timeoutDuration);
     
-        try {
-            const response = await axios.get('http://127.0.0.1:5000/orders');
-            setOrders(response.data);
-            console.log(orders);
-        } catch (error) {
-            setError('Error fetching products:', error)
-        } finally {
-            clearTimeout(timeoutId);
-        }
-    };
+    //     try {
+    //         const response = await axios.get('http://127.0.0.1:5000/orders');
+    //         setOrders(response.data);
+    //         console.log(orders);
+    //     } catch (error) {
+    //         setError('Error fetching products:', error)
+    //     } finally {
+    //         clearTimeout(timeoutId);
+    //     }
+    // };
 
-    const calcSalesTotal = () => {
-        let total_sales = 0;
-        customerOrders.forEach((order) => {
-            total_sales += order.total_amount;
-        });
-        setSalesTotal(total_sales);
-    };
+    // const calcSalesTotal = () => {
+    //     let total_sales = 0;
+    //     customerOrders.forEach((order) => {
+    //         total_sales += order.total_amount;
+    //     });
+    //     setSalesTotal(total_sales);
+    // };
 
-    const calcWeeklySales = () => {
-        let total_sales = 0;
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+    // const calcWeeklySales = () => {
+    //     let total_sales = 0;
+    //     const oneWeekAgo = new Date();
+    //     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
-        customerOrders.forEach((order) => {
-            const orderDate = new Date(order.order_date_time.split('T')[0]);
-            if (orderDate >= oneWeekAgo) {
-                total_sales += order.total_amount;
-            }
-        });
+    //     customerOrders.forEach((order) => {
+    //         const orderDate = new Date(order.order_date_time.split('T')[0]);
+    //         if (orderDate >= oneWeekAgo) {
+    //             total_sales += order.total_amount;
+    //         }
+    //     });
 
-        setWeeklySales(total_sales);
-    };
+    //     setWeeklySales(total_sales);
+    // };
 
     // const handleRestock = () => {
     //     fetchCatalog()
     // };
+
+    const getTotals = async () => {
+        try {
+            const response = await axios.get('http://127.0.0.1:5000/orders/totals');
+            console.log(response.data);
+            const total = response.data.total_sales;
+            const week = response.data.weekly_sales;
+
+            setSalesTotal(total);
+            setWeeklySales(week);
+        } catch (error) {
+            setError('Error fetching sales totals:', error);
+        }
+    }
 
 
     const handleClose = () => {
@@ -90,23 +104,36 @@ function AdminProfile() {
         setShowRedirect(false);
     };
 
+    
+    // useEffect(() => {
+    //     const loadOrders = async () => {
+    //         await fetchOrders();
+    //     };
+    
+    //     const loadProducts = async () => {
+    //         await fetchCatalog();
+    //     };
+
+    //     loadOrders();
+    //     loadProducts();
+    // }, [products, customerOrders]);
+
+    // useEffect(() => {
+    //     calcSalesTotal();
+    //     calcWeeklySales();
+    // }, [customerOrders]);
+
+    // useEffect(() => {
+    //     const loadProducts = async () => {
+    //         await fetchCatalog();
+    //     };
+
+    //     loadProducts();
+    // }, [products]);
+
     useEffect(() => {
-        const loadOrders = async () => {
-            await fetchOrders();
-        };
-
-        const loadProducts = async () => {
-            await fetchCatalog();
-        }
-
-        loadOrders();
-        loadProducts();
-    }, [products, customerOrders])
-
-    useEffect(() => {
-        calcSalesTotal();
-        calcWeeklySales();
-    }, [customerOrders]);
+        getTotals();
+    }, []);
 
 
     return (
@@ -114,7 +141,7 @@ function AdminProfile() {
         <Container className="adminNav bg-warning-subtle h-100" >
             <Nav>
                 <div className="d-grid">
-                    <StockMonitor products={products} />
+                    <StockMonitor />
                     <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
                     <Button type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
                         Add Product
