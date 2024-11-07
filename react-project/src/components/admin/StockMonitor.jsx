@@ -90,7 +90,7 @@ function StockMonitor({products}) {
             console.error('Error fetching product details:', error);
             setError(error);
         } finally {
-            redirectDocument('/admin-profile');
+            // redirectDocument('/admin-profile');
         }
     };
 
