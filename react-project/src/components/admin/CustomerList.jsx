@@ -216,7 +216,7 @@ function CustomerList() {
                                                 ) : (
                                                     <>
                                                         <Row className='mb-3'>
-                                                            <Button className='fs-5' variant='outline-info' onClick={() => handleEditAccount(customersAccounts.id.customer_id)}>
+                                                            <Button className='fs-5' variant='outline-info' onClick={() => handleCreateAccount(customersAccounts.id.customer_id)}>
                                                                 Create Account Login
                                                             </Button>
                                                         </Row>

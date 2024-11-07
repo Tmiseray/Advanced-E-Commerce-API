@@ -1,15 +1,12 @@
 
-import OrderHistory from "../OrderHistory";
+import OrderHistory from "./OrderHistory";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Accordion, Nav, Card, Button, ProgressBar, Modal, Spinner, Container, Row, Col, NavLink, useAccordionButton } from "react-bootstrap";
-import axios from "axios";
+import { Nav, Button, Container, Row, Col } from "react-bootstrap";
 
 function CustomerProfile() {
     const [id, setId] = useState(null);
     const [name, setName] = useState(null);
-    const [showDelete, setShowDelete] = useState(false);
-
     const navigate = useNavigate();
 
     const getStorageItems = () => {
@@ -23,26 +20,6 @@ function CustomerProfile() {
         getStorageItems();
     }, [id]);
 
-    if (showDelete) {
-        return (
-            <Modal onHide={handleClose} backdrop='static' keyboard={false} centered >
-                <Modal.Header>
-                    <Modal.Title>Deletion</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    Deleting Order
-                    <Spinner animation="grow" size="sm" /> 
-                    <Spinner animation="grow" size="sm" /> 
-                    <Spinner animation="grow" size="sm" /> 
-                </Modal.Body>
-                <Modal.Footer>
-                    <Button variant='outline-secondary' onClick={handleClose} >
-                        Continue
-                    </Button>
-                </Modal.Footer>
-            </Modal>
-        )
-    };
 
     return (
         <>

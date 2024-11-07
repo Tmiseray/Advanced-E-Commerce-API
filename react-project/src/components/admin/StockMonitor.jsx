@@ -1,20 +1,12 @@
-/*
 
-- View and Manage Product Stock Levels (Bonus): Develop a component for viewing and managing the stock levels of each product in the catalog. Administrators should be able to see the current stock level and make adjustments as needed.
-- Restock Products When Low (Bonus): Implement a component that monitors product stock levels and triggers restocking when they fall below a specified threshold. Ensure that stock replenishment is efficient and timely.
-
-*/
 
 import { useEffect, useState } from "react";
-import { array, func } from 'prop-types';
 import { Container, Badge, Button, Spinner, ListGroup, Modal } from "react-bootstrap";
 import axios from "axios";
-import { redirectDocument } from "react-router-dom";
 
 function StockMonitor() {
     const [productsBelowThreshold, setProductsBelowThreshold] = useState([]);
     const [numProductsToStock, setNumProductsToStock] = useState(0);
-    const [productDetails, setProductDetails] = useState({});
     const [products, setProducts] = useState([]);
     const [modalMessage, setModalMessage] = useState([]);
     const [showMessage, setShowMessage] = useState(false);
@@ -41,6 +33,7 @@ function StockMonitor() {
     };
 
     const fetchProductDetails = async () => {
+
         const belowThreshold = products.filter(product => product.product_stock <= threshold);
         console.log('Products below threshold:', belowThreshold)
         
@@ -50,7 +43,6 @@ function StockMonitor() {
             try {
                 const response = await axios.get(`http://127.0.0.1:5000/products/${product.product_id}`);
                 const detailsData = response.data;
-                // console.log(detailsData);
                 const productStock = product.product_stock;
                 
                 details[detailsData.id.toString()] = {
@@ -80,17 +72,28 @@ function StockMonitor() {
             const response = await axios.post(`http://127.0.0.1:5000/stock-monitor`);
             const messageData = response.data;
             console.log(messageData);
-            
-            // messages.push(messageData['message']);
+        
             if (messageData['Products Below Threshold'].length === 0) {
                 messages.push("No products below threshold to restock.");
             }
 
-            messages.push(messageData['message'], messageData['Restocking Details']);
+            messages.push(messageData['message']);
+
+            if (messageData['Restocking Details'].length > 0) {
+                messageData['Restocking Details'].forEach(stock => {
+                    const restockMessage = `Product ID: ${stock.product_id}, New Stock: ${stock.new_stock_quantity}, Last Restocked: ${stock.last_restock_date}`;
+                    messages.push(restockMessage);
+                });
+            }
+
             console.log(messageData);
 
             setModalMessage(messages);
             setShowMessage(true);
+
+            await fetchCatalog();
+            await fetchProductDetails();
+
             setProductsBelowThreshold([]);
             handleUpdateProducts(messages);
         } catch (error) {
@@ -133,9 +136,8 @@ function StockMonitor() {
     }, []);
 
     useEffect(() => {
-        
         fetchProductDetails();
-    }, [products]);
+    }, []);
     
     if (isRestocking) {
         return (
@@ -203,8 +205,3 @@ function StockMonitor() {
 };
 
 export default StockMonitor;
-
-// StockMonitor.propTypes = {
-//     products: array,
-//     setProducts: func
-// }

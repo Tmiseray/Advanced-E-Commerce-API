@@ -154,13 +154,16 @@ function OrderForm() {
                 response = await axios.post(`http://127.0.0.1:5000/place-order`, payload);
             }
 
-            const returnedId = response.data.order_id;
+            if (response.data.error) {
+                setErrorMessage(response.data.error);
+            } else {
+                const returnedId = response.data.order_id;
+                setNewOrderId(returnedId);
+                setShowSuccess(true);
+            }
 
-            setNewOrderId(returnedId);
-
-            setShowSuccess(true);
         } catch (error) {
-            setErrorMessage(error.message);
+            setErrorMessage(error.response ? error.response.data.error : 'An unknown error occurred');
         } finally {
             setSubmitting(false);
         }

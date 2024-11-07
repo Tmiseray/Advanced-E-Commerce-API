@@ -76,7 +76,7 @@ function OrderList() {
         setError('');
 
         try {
-            const response = await axios.get(`http://127.0.0.1:5000/orders/track-status/?customer_id=${customerId}&id=${orderId}`);
+            const response = await axios.get(`http://127.0.0.1:5000/orders/track-status/${customerId}/${orderId}`);
             const statusData = response.data;
             console.log(response.data);
 
@@ -124,17 +124,9 @@ function OrderList() {
         }
     };
 
-    // useEffect(() => {
-    //     if (!customerOrders) {
-    //         fetchOrders();
-    //     } else {
-    //         setOrders(customerOrders);
-    //     }
-    // }, [orders]);
-
     useEffect(() => {
         fetchOrders();
-    }, [orders]);
+    }, []);
 
     useEffect(() => {
         console.log("Tracking State updated", tracking);

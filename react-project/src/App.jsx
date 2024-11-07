@@ -13,8 +13,7 @@ import CustomerProfile from './components/client/CustomerProfile';
 import ProductList from './components/client/ProductList';
 import OrderForm from './components/client/OrderForm';
 // App Components
-// import OrderForm from './components/OrderForm';
-import OrderHistory from './components/OrderHistory';
+import OrderHistory from './components/client/OrderHistory';
 import Footer from './components/Footer';
 import HomePage from './components/HomePage';
 import LoginForm from './components/LoginForm';
@@ -24,7 +23,7 @@ import OrderDetails from './components/OrderDetails';
 // Styles
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Modal, Button } from 'react-bootstrap';
 import axios from 'axios';
 

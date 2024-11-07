@@ -130,17 +130,9 @@ function FullCatalog() {
         }
     };
 
-    // useEffect(() => {
-    //     if (!catalogProducts) {
-    //         fetchCatalog();
-    //     } else {
-    //         setProducts(catalogProducts);
-    //     }
-    // }, [products]);
-
     useEffect(() => {
         fetchCatalog();
-    }, [products]);
+    }, []);
 
 
     useEffect(() => {

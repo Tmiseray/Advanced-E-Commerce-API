@@ -84,8 +84,7 @@ function OrderHistory() {
         setError('');
 
         try {
-            // const response = await axios.get(`http://127.0.0.1:5000/orders/track-status`, { params: {customer_id: `${customerId}`, order_id: `${orderId}`} });
-            const response = await axios.get(`http://127.0.0.1:5000/orders/track-status/?customer_id=${customerId}&order_id=${orderId}`)
+            const response = await axios.get(`http://127.0.0.1:5000/orders/track-status/${customerId}/${orderId}`)
             const statusData = response.data;
             console.log(response.data);
 

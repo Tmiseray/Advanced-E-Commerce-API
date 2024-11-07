@@ -156,12 +156,12 @@ footer {
 .productForm,
 .customerForm,
 .accountForm,
+.customerContainer,
 .orderForm {
   box-shadow: 0 0 13px 7px rgba(0, 0, 0, 0.8)
 }
 
-.adminContainer,
-.customerContainer {
+.adminContainer {
   margin-left: 210px;
   margin-right: 0;
   box-shadow: 0 0 13px 7px rgba(0, 0, 0, 0.8)

@@ -1,17 +1,14 @@
 
 import { useNavigate } from "react-router-dom";
-import { Accordion, Nav, Card, Button, ProgressBar, Modal, Spinner, Container, Row, Col, NavLink } from "react-bootstrap";
+import { Nav, Button, Modal, Spinner, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import FullCatalog from "./FullCatalog";
 import OrderList from "./OrderList";
 import StockMonitor from "./StockMonitor";
-import OrderHistory from "../OrderHistory";
 
 
 function AdminProfile() {
-    const [products, setProducts] = useState([]);
-    // const [customerOrders, setOrders] = useState([]);
     const [salesTotal, setSalesTotal] = useState('');
     const [weeklySales, setWeeklySales] = useState('');
     const [error, setError] = useState('');
@@ -19,69 +16,7 @@ function AdminProfile() {
     const [isDeactivating, setIsDeactivating] = useState(false);
     const navigate = useNavigate();
 
-    // const fetchCatalog = async () => {
-    //     setError('');
-    
-    //     const timeoutDuration = 10000;
-    //     const timeoutId = setTimeout(() => {
-    //     }, timeoutDuration);
-    
-    //     try {
-    //         const response = await axios.get('http://127.0.0.1:5000/catalog');
-    //         setProducts(response.data);
-    //     } catch (error) {
-    //         setError('Error fetching products:', error)
-    //     } finally {
-    //         clearTimeout(timeoutId);
-    //     }
-    // };
-
-
-    // const fetchOrders = async () => {
-    //     setError('');
-    
-    //     const timeoutDuration = 10000;
-    //     const timeoutId = setTimeout(() => {
-    //     }, timeoutDuration);
-    
-    //     try {
-    //         const response = await axios.get('http://127.0.0.1:5000/orders');
-    //         setOrders(response.data);
-    //         console.log(orders);
-    //     } catch (error) {
-    //         setError('Error fetching products:', error)
-    //     } finally {
-    //         clearTimeout(timeoutId);
-    //     }
-    // };
-
-    // const calcSalesTotal = () => {
-    //     let total_sales = 0;
-    //     customerOrders.forEach((order) => {
-    //         total_sales += order.total_amount;
-    //     });
-    //     setSalesTotal(total_sales);
-    // };
-
-    // const calcWeeklySales = () => {
-    //     let total_sales = 0;
-    //     const oneWeekAgo = new Date();
-    //     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-
-    //     customerOrders.forEach((order) => {
-    //         const orderDate = new Date(order.order_date_time.split('T')[0]);
-    //         if (orderDate >= oneWeekAgo) {
-    //             total_sales += order.total_amount;
-    //         }
-    //     });
-
-    //     setWeeklySales(total_sales);
-    // };
-
-    // const handleRestock = () => {
-    //     fetchCatalog()
-    // };
-
+   
     const getTotals = async () => {
         try {
             const response = await axios.get('http://127.0.0.1:5000/orders/totals');
@@ -103,33 +38,6 @@ function AdminProfile() {
         }
         setShowRedirect(false);
     };
-
-    
-    // useEffect(() => {
-    //     const loadOrders = async () => {
-    //         await fetchOrders();
-    //     };
-    
-    //     const loadProducts = async () => {
-    //         await fetchCatalog();
-    //     };
-
-    //     loadOrders();
-    //     loadProducts();
-    // }, [products, customerOrders]);
-
-    // useEffect(() => {
-    //     calcSalesTotal();
-    //     calcWeeklySales();
-    // }, [customerOrders]);
-
-    // useEffect(() => {
-    //     const loadProducts = async () => {
-    //         await fetchCatalog();
-    //     };
-
-    //     loadProducts();
-    // }, [products]);
 
     useEffect(() => {
         getTotals();
