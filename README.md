@@ -120,40 +120,40 @@ The application integrates with the backend API, providing endpoints for core fu
 
 *** Customer and CustomerAccount Management ***
 
-POST /register: Create a new customer
-GET /customers: Retrieve all customers
-GET /customers/{id}: Retrieve a customer by ID
-PUT /customers/{id}: Update customer details
-DELETE /customers/{id}: Delete a customer
+- POST /register: Create a new customer
+- GET /customers: Retrieve all customers
+- GET /customers/{id}: Retrieve a customer by ID
+- PUT /customers/{id}: Update customer details
+- DELETE /customers/{id}: Delete a customer
 
-POST /create-account/{id}: Create a new customer's account for login
-GET /accounts/{id}: Retrieve account information for a specific customer
-PUT /accounts/{id}: Update customer's account information
-DELETE /accounts/{id}: Delete customer's account login information
+- POST /create-account/{id}: Create a new customer's account for login
+- GET /accounts/{id}: Retrieve account information for a specific customer
+- PUT /accounts/{id}: Update customer's account information
+- DELETE /accounts/{id}: Delete customer's account login information
 
-GET/POST /login: Login method
-POST /logout: Logout method
+- GET/POST /login: Login method
+- POST /logout: Logout method
 
 *** Product and Catalog Management ***
 
-POST /add-product: Create a new product
-GET /products/{id}: Retrieve a product by ID
-GET /products/active-products: Retrieve all active products for customer's view
-PUT /products/{id}: Update product details (name, price)
-PUT /products/deactivate/{id}: Soft-delete product, makes the product inactive so it's still available in the full Catalog, but won't show as a product a customer can order
+- POST /add-product: Create a new product
+- GET /products/{id}: Retrieve a product by ID
+- GET /products/active-products: Retrieve all active products for customer's view
+- PUT /products/{id}: Update product details (name, price)
+- PUT /products/deactivate/{id}: Soft-delete product, makes the product inactive so it's still available in the full Catalog, but won't show as a product a customer can order
 
-POST /add-to-catalog: Adds a product to the admin's Catalog
-GET /catalog: Gets all products' details in the Catalog (ID, Current Stock, Last Restock Date)
-POST /stock-monitor: Monitors stock levels of products and if any are below the threshold (10), automatically restocks them
+- POST /add-to-catalog: Adds a product to the admin's Catalog
+- GET /catalog: Gets all products' details in the Catalog (ID, Current Stock, Last Restock Date)
+- POST /stock-monitor: Monitors stock levels of products and if any are below the threshold (10), automatically restocks them
 
 *** Order Processing ***
 
-POST /place-order: Place a new order
-GET /orders: Retrieves every order
-GET /orders/{id}: Retrieve an order by ID
-PUT /orders/{id}: Updates an order by ID
-DELETE /orders/{id}: Delete an order by ID
-GET /orders/history-for-customer/{customerId}: Retrieve order history for a customer
+- POST /place-order: Place a new order
+- GET /orders: Retrieves every order
+- GET /orders/{id}: Retrieve an order by ID
+- PUT /orders/{id}: Updates an order by ID
+- DELETE /orders/{id}: Delete an order by ID
+- GET /orders/history-for-customer/{customerId}: Retrieve order history for a customer
 
 *** Bonus Features ***
 1. Manage Product Stock Levels
