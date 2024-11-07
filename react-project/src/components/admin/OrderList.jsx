@@ -64,7 +64,7 @@ function OrderList() {
 
         try {
             const response = await axios.delete(`http://127.0.0.1:5000/orders/${id}`);
-            setDeleteMessage(response.data);
+            setDeleteMessage(response.data.message);
         } catch (error) {
             setError('Error deleting order:', error);
         } finally {
@@ -126,7 +126,7 @@ function OrderList() {
 
     useEffect(() => {
         fetchOrders();
-    }, []);
+    }, [orders]);
 
     useEffect(() => {
         console.log("Tracking State updated", tracking);

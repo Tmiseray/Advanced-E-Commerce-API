@@ -132,7 +132,7 @@ function FullCatalog() {
 
     useEffect(() => {
         fetchCatalog();
-    }, []);
+    }, [products]);
 
     useEffect(() => {
         console.log('Details State updated:', details);

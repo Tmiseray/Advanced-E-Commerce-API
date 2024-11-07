@@ -6,10 +6,11 @@
 */
 
 import { useEffect, useState } from "react";
+import { array, func } from 'prop-types';
 import { Container, Badge, Button, Spinner, ListGroup, Modal } from "react-bootstrap";
 import axios from "axios";
 
-function StockMonitor({products}) {
+function StockMonitor({products, onRestock}) {
     const [productsBelowThreshold, setProductsBelowThreshold] = useState([]);
     const [numProductsToStock, setNumProductsToStock] = useState(0);
     const [productDetails, setProductDetails] = useState({});
@@ -64,14 +65,14 @@ function StockMonitor({products}) {
             // messages.push(messageData['message']);
             if (messageData['Products Below Threshold'].length === 0) {
                 messages.push("No products below threshold to restock.");
-            } else {
-                messages.push(messageData['message']);
-                setProductsBelowThreshold(product => {
-                    product.product_stock += 20;
-                })
             }
+
+            messages.push(messageData['message']);
             setModalMessage(messages);
             setShowMessage(true);
+            setProductsBelowThreshold([]);
+            onRestock();
+                
         } catch (error) {
             console.error('Error restocking products:', error.response ? error.response.data : error.message);
             setError('Error restocking products');
@@ -84,6 +85,7 @@ function StockMonitor({products}) {
         setShowMessage(false);
         try {
             await fetchProductDetails();
+
         } catch (error) {
             console.error('Error fetching product details:', error);
             setError(error);
@@ -119,7 +121,7 @@ function StockMonitor({products}) {
                 <Modal.Body className="text-warning-emphasis bg-warning-subtle">
                     Products currently below the stock threshold:
                     <ListGroup>
-                        {productsBelowThreshold.length > 0 ? (
+                        {productsBelowThreshold && productsBelowThreshold.length > 0 ? (
                             productsBelowThreshold.map(product => (
                                 <ListGroup.Item key={product.id}>
                                     {product.name} - Current Stock: {product.stock}
@@ -131,7 +133,7 @@ function StockMonitor({products}) {
                     </ListGroup>
                 </Modal.Body>
                 <Modal.Footer className="bg-warning-subtle">
-                    {productsBelowThreshold.length > 0 ? (
+                    {productsBelowThreshold && productsBelowThreshold.length > 0 ? (
                         <Button variant="outline-primary" onClick={handleRestock} >Restock All</Button>
                     ) : (
                         <Button variant="outline-secondary" onClick={() => setShowAlert(false)} >Close</Button>
@@ -161,22 +163,7 @@ function StockMonitor({products}) {
 
 export default StockMonitor;
 
-
-// {/* <Overlay target={targetRef.current} placement="right" show={showOverlay} onHide={() => setShowOverlay(false)}>
-//                 {/* {popover} */}
-//                 <Popover id="popover-basic">
-//                     <Popover.Header as="h3">Products Below Threshold</Popover.Header>
-//                     <Popover.Body>
-//                         {productsBelowThreshold.length > 0? (
-//                             productsBelowThreshold.map(product => (
-//                                 <div key={product.product_id}>{product.name}</div>
-//                                 ))
-//                         ) : (
-//                             <div>No products below threshold.</div>
-//                         )}
-//                     </Popover.Body>
-//                     <Popover.Footer>
-//                         <Button onClick={() => handleRestock()} disabled={numProductsToStock === 0} >Restock All</Button>
-//                     </Popover.Footer>
-//                 </Popover>
-//             </Overlay> */}
+StockMonitor.propTypes = {
+    products: array,
+    onRestock: func
+}

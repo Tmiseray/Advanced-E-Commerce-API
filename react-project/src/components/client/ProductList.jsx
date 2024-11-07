@@ -8,6 +8,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button, Container, ListGroup, Modal, Spinner } from "react-bootstrap";
 
+
 function ProductList() {
     const [products, setProducts] = useState([]);
     const [isFetching, setIsFetching] = useState(false);

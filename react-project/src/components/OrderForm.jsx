@@ -6,7 +6,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { object, func } from 'prop-types';
 import { Form, Button, Alert, Modal, Spinner, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
@@ -19,15 +18,12 @@ function OrderForm() {
         price_per_unit: ''
     }])
     const [errors, setErrors] = useState([]);
-    const [isFetchingOrder, setIsFetchingOrder] = useState(false);
-    const [isFetchingDetails, setIsFetchingDetails] = useState(false);
     const [isSubmitting, setSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
     const [customerId, setCustomerId] = useState('');
     const { order_id } = useParams();
     const navigate = useNavigate();
-    const variantList = ['primary', 'info'];
 
     useEffect(() => {
         if (order_id) {
@@ -123,7 +119,7 @@ function OrderForm() {
             price_per_unit: ''
          }]);
         setSubmitting(false);
-        navigate(`/orders/${order_id}`);
+        navigate(`/orders/details/${order_id}`);
     };
 
     if (isSubmitting) return 
@@ -202,8 +198,6 @@ function OrderForm() {
                         )}
                     </div>
                 ))}
-
-                {/* <div className="body" >{JSON.stringify(orderDetails)} </div> */}
 
                 <Button className="w-100 fs-4 mt-5" variant="outline-info" type="submit" disabled={isSubmitting} >
                     {isSubmitting ? <Spinner as='span' animation="border" size="sm" /> : 'Submit' }

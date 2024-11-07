@@ -18,7 +18,6 @@ function AccountForm() {
     const [isSubmitting, setSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
-    
     const { id, newId } = useParams();
     const navigate = useNavigate();
 

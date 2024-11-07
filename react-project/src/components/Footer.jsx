@@ -4,7 +4,7 @@ import { Container, Row, Col, Image, Nav } from "react-bootstrap";
 function Footer() {
     return (
         
-            <footer className='bg-black justify-content-between alight-items-center text-center w-100' >
+            <footer className='bg-black bg-gradient justify-content-between alight-items-center text-center w-100' >
                 <Row>
                     <Col></Col>
                     <Col>

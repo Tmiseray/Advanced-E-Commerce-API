@@ -78,6 +78,10 @@ function AdminProfile() {
         setWeeklySales(total_sales);
     };
 
+    const handleRestock = () => {
+        fetchCatalog()
+    };
+
 
     const handleClose = () => {
         if (isDeactivating) {
@@ -110,7 +114,7 @@ function AdminProfile() {
         <Container className="adminNav bg-warning-subtle h-100" >
             <Nav>
                 <div className="d-grid">
-                    <StockMonitor products={products} />
+                    <StockMonitor products={products} onRestock={handleRestock} />
                     <h3 className="text-decoration-underline text-warning pt-5 mb-3">Quick Links</h3>
                     <Button type="button" variant="outline-warning" activeclassname='active' onClick={() => navigate('/add-product')} >
                         Add Product
@@ -153,7 +157,6 @@ function AdminProfile() {
                                 </Col>
                                 <Col colSpan={7} className="">
                                     <OrderList />
-                                    {/* <OrderHistory /> */}
                                 </Col>
                             </Row>
                         </Col>
